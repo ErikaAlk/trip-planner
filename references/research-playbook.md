@@ -24,7 +24,11 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    and **read** the fare:
    - 国内（**2026-06 实测平台真值表，省时间，别去碰已废的**）:
      - ✅ **携程** (`flights.ctrip.com` / `hotels.ctrip.com`) — 机票酒店免登录可读，台面价为裸价。
-     - ✅ **飞猪** — 可用；常要淘宝登录 → 走登录墙协议（停在登录页、攒批问用户）。
+     - ✅ **飞猪** — 机票/酒店 web 均可用（需淘宝登录态；连续查询可能触发验证码 → 走登录墙协议）。
+       **机票必须用带全参数的 URL**，缺 `depDate`/城市三字码会报「入参校验失败」（别误判成已废）。模板：
+       `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity=SHA&arrCity=CTU&depDate=YYYY-MM-DD&depCityName=上海&arrCityName=成都`
+       酒店：`https://hotel.fliggy.com/hotel_list3.htm?cityName=成都&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords=酒店名`
+       列表价均为**裸价**（机票表头自标「不含税费」）。
      - ✅ **航司官网**（**必查**，东航/国航/南航实测可查价，吉祥/春秋等多数也可）— 有优惠券时可能比 OTA 低，
        且官网能读到**含税总价**（见下条）。
      - ✅ **高德地图** — 查不了酒店价格，但 **POI 评价真实可靠**（可作酒店评论信源），且路线规划给出
