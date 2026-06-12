@@ -18,7 +18,7 @@ during the trip — concrete times, addresses, prices, "how to get there", and w
 `weather_fetch` tool here. Do research with **`web_search`**; render the map by embedding
 **Leaflet + OpenStreetMap** in the output HTML (OSM tiles need no API key). For requirements
 gathering use the **`AskUserQuestion`** structured-question tool if available, otherwise ask in plain
-text — concise and batched, never an interrogation.
+text — batched by dependency layer, each question carrying a recommended answer (see Step 1).
 
 **Output path.** Write the final HTML to the current working directory (or a directory the user
 names). Filename: `<目的地><N>日游行程.html` (e.g. `东京5日游行程.html`).
@@ -45,37 +45,55 @@ The six steps below are mandatory and **in order**. Do not skip Step 1.
 
 ---
 
-## Step 1 — 需求采集 (REQUIREMENTS — never skip, never jump straight to an itinerary)
+## Step 1 — 需求采集（GRILL，问透为止 — never skip, never jump straight to an itinerary）
 
 **This is the most common failure mode: producing a generic itinerary before knowing who's traveling
-and what they want. Don't.** First read the user's message and extract whatever they already gave —
-**never re-ask what you already know.** Then collect the rest in **one concise batch** (use
-`AskUserQuestion` with a few multiple-choice questions if available; otherwise a short numbered list).
+and what they want. Don't.** 需求采集采用 **grill 式访谈**（方法源自 [grill-me](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md)）：
+**沿着决策树把每一个分支问到底，直到没有任何一项需求是靠猜的**。四条铁律：
 
-Collect, prioritising what's missing:
+1. **问透为止，不设问题数上限。** 下面清单里的每一项，要么用户答了，要么用户明确同意用推荐值——
+   没有第三种状态。一轮 3–4 问、按依赖顺序分多轮（用 `AskUserQuestion`，没有就纯文本编号提问），
+   问完一层再问下一层，直到清单清零。
+2. **每问必附推荐答案。** 每个问题给出你基于已知信息的推荐选项和一句理由（放在选项第一位），
+   用户嫌烦可以整轮"都按推荐"。
+3. **能查的绝不问。** 凡是 web_search/浏览器能查到的（天气、闭馆日、签证政策、有没有直达高铁），
+   自己查；只问存在于用户脑子里的事（偏好、约束、已订了什么）。
+4. **先读 prompt，绝不重问已知。** 开场先把用户已给的信息抽出来打勾，只 grill 缺口。
 
-- **目的地** + **出发地** (city/airport you depart from)
-- **日期 / 天数** (exact dates if possible — drives weather, festivals, closures, ticket availability)
-- **同行构成** — 亲子（孩子年龄）/ 银发（体力、无障碍）/ 情侣 / 朋友 / 独行 / 商务+休闲
-- **预算档次** — 经济 / 舒适 / 轻奢（人均/天 或 总预算）
-- **节奏** — 暴走（多点高强度）/ 适中 / 悠闲（每天少而精）
+### 需求决策树（按依赖顺序分层 grill）
+
+**第 1 层 · 骨架（决定一切的硬事实）**
+- **目的地 + 出发地**（精确到城市/机场）
+- **日期 / 天数**（精确日期；驱动天气、节庆、闭馆、票价）
+- **大交通是否已订？** 已订 → 拿到具体班次/车次时刻，行程以它为锚，Step 2 只做接驳；
+  未订 → Step 2 全流程实查比价
+- **城际出行方式偏好** — 飞机 / 高铁 / 自驾 / 不限（价格 vs 时间怎么权衡；红眼/早班能不能接受）
+- **时间硬约束** — 出发日最早几点能出门？返程当天必须几点前到家？行程中间有无固定事项（会议/探亲/复诊）
+- **证件** — 身份证/护照在不在有效期？出境/港澳台需要的签证签注办了吗（政策本身自己查，证件状态问用户）
+
+**第 2 层 · 人和钱（决定行程形态）**
+- **同行构成** — 人数；亲子（孩子年龄）/ 银发（体力、无障碍）/ 情侣 / 朋友 / 独行 / 商务+休闲
+- **健康与体力** — 每天能走多少步？爬山/楼梯行不行？需不需要午休？晕车船/高反史？常用药？
+- **预算口径** — 总预算还是人均/天？机酒大头含不含在内？有没有不能破的硬上限？
+- **节奏** — 暴走 / 适中 / 悠闲（每天少而精）
 - **兴趣偏好** — 自然 / 历史人文 / 美食 / 购物 / 艺术展馆 / 夜生活 / 亲子乐园 / 摄影出片
+- **必去 / 避雷清单** — 点名要去的，和明确不想要的类型
+
+**第 3 层 · 落地细节（决定每张卡片怎么填）**
+- **住宿** — 已订（给地址）还是待选？几间房、什么床型？品牌偏好/忌讳？要不要含早？位置偏好
+  （市中心 / 枢纽旁 / 景区附近）
 - **市内交通方式** — 地铁公交 / 打车 / 自驾租车 / 步行为主
-- **住宿位置偏好** — 市中心 / 交通枢纽旁 / 景区附近 / 已订（给地址）
-- **饮食与无障碍需求** — 忌口、清真/素食、过敏；婴儿车 / 轮椅 / 少走楼梯
-- **必去 / 避雷清单** — 一定要去的点，或明确不想去的类型
+- **行李** — 有无托运需求（廉航是否适配）？婴儿车 / 轮椅？
+- **餐饮** — 忌口、过敏、清真/素食？辣度接受度？有没有必吃清单？
+- **天气与弹性** — 雨天还出门吗？高温耐受？行程有变数吗（要不要退改弹性/保险提醒）？
 
-Guidance:
-- Ask **only for what's missing**, and don't exceed ~4 questions in the first round. If the user gave a
-  rich prompt, you may only need to confirm 1–2 things.
-- If the user insists "你直接安排就行 / just decide for me", proceed — but **state the assumptions you're
-  making** (e.g. "按 中等预算 + 适中节奏 + 地铁出行 安排，如不符再告诉我") so they can correct you.
-- A destination + dates with no other info still needs at least **同行构成 / 预算 / 节奏 / 兴趣** before
-  you build days.
+**第 4 层 · 收口**
+- 最后一问固定是：**「还有什么硬要求是我没问到的？」** 答"没有"才算 grill 结束。
+- 结束后**回读一遍完整需求清单**（含所有推荐值的采纳情况）让用户确认，再进 Step 2。
 
-When using `AskUserQuestion`, good first-round questions are: 同行构成, 预算档次, 节奏, 兴趣偏好
-(each as a single-select or multi-select with 3–4 options). Capture 目的地/出发地/日期 from the prompt
-or a one-line text ask.
+Escape hatch：用户说"你直接安排就行 / just decide for me"时不再追问，全部缺口按推荐值填——但
+**整张假设清单必须原样写进 HTML 顶部的 info callout**（已有机制），并在回复里提醒"按这些假设排的，
+不符再说"。
 
 ---
 
