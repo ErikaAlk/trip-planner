@@ -22,9 +22,21 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
 2. **Browser pass (required):** with whichever browser tool is connected — **Claude in Chrome**,
    **Windows-MCP**, or **Desktop Commander** — open each platform's results page for that flight/date
    and **read** the fare:
-   - 国内: 去哪儿 (`flight.qunar.com`)、携程 (`flights.ctrip.com`)、飞猪、**航司官网**（官网有时最低、改签灵活）。
+   - 国内（**2026-06 实测平台真值表，省时间，别去碰已废的**）:
+     - ✅ **携程** (`flights.ctrip.com` / `hotels.ctrip.com`) — 机票酒店免登录可读，台面价为裸价。
+     - ✅ **飞猪** — 可用；常要淘宝登录 → 走登录墙协议（停在登录页、攒批问用户）。
+     - ✅ **航司官网**（**必查**，东航/国航/南航实测可查价，吉祥/春秋等多数也可）— 有优惠券时可能比 OTA 低，
+       且官网能读到**含税总价**（见下条）。
+     - ✅ **高德地图** — 查不了酒店价格，但 **POI 评价真实可靠**（可作酒店评论信源），且路线规划给出
+       **打车费/时长估算**（市内交通数字必须从这里来，不许拍脑袋）。
+     - ❌ 已废，不要再查：**去哪儿**（机票+酒店桌面端均已下线）、**美团**（web 403）、**同程/艺龙**（基本残废）、
+       **华住会官网**（查不到价）。
    - 国际: **Google Flights**、**Skyscanner**、航司官网 — these need no login, so prefer them and they
      rarely hit a wall.
+
+   **燃油附加费 + 机场建设费（国内机票绝不可漏）：** 所有平台列表页显示的都是**裸票价**，不含
+   燃油附加费与机建费。预算表必须用**含税总价** — 在航司官网或平台的价格明细里读出实际税费；读不到就在
+   票价旁明确标注「票面价 · 燃油/机建另计，以出票页为准」，**绝不能自己编一个税费数**。
 3. Record each `platform → price` **with the exact query time**, put them in `.price-compare` (cheapest
    tagged `class="cheapest"`), and set `.tr-price` to "最低 ¥X".
 
@@ -68,7 +80,7 @@ the HTML rather than guessing.
 ## 2. Browser automation — only when search isn't enough
 
 Use **Claude in Chrome** or **Windows-MCP** (whichever is installed) **only** to read live
-availability / exact fares on 携程 / 去哪儿 / 飞猪 / 12306. It is a read-only lookup, not a booking flow.
+availability / exact fares on 携程 / 飞猪 / 航司官网 / 12306. It is a read-only lookup, not a booking flow.
 
 **Stop-and-hand-back triggers (do not cross these):**
 - Login / account / password prompt → stop.
@@ -88,8 +100,8 @@ Selecting one is the same discipline as flights — **research, don't trust the 
 platforms; never book.**
 
 **Read the review section, not the marketing blurb (the decisive step).** A polished listing and a high
-headline number prove nothing. Open the actual reviews on 大众点评 / 携程 / 去哪儿 / 小红书 / Google /
-Booking and **sort to recent + lowest** so you read fresh and negative ones, then judge whether the
+headline number prove nothing. Open the actual reviews on 携程 / **高德地图**（POI 评价真实度高，可靠信源）/
+大众点评 / 小红书 / Google / Booking and **sort to recent + lowest** so you read fresh and negative ones, then judge whether the
 review area looks **normal**:
 
 | Signal | Healthy (pick) | Suspicious (avoid / warn) |
@@ -110,8 +122,9 @@ recourse): **华住会** (汉庭 / 全季 / 桔子 / 星程 / 宜必思 / 美居
 and it suits the trip — flag the higher variance.
 
 **Multi-platform price (per night) — reuse the flight flow exactly.** Browser-check the same room/date on
-携程 / 去哪儿 / 飞猪 / 美团 (+ Booking/Agoda international), and **the group's own App often has the lowest
-member price** (e.g. 华住会). Cheapest tagged, query time noted, `.price-compare` block. **Same defer-and-
+**携程 + 飞猪** (+ Booking/Agoda international)，评价交叉看**高德**。**不要默认「集团 App 会员价更低」**——
+实测华住会企业铂金会员价也未必低于携程，且华住会官网根本查不到价；会员价只有真读到了才能写。Cheapest
+tagged, query time noted, `.price-compare` block. **Same defer-and-
 batch login handling and query-only prohibitions as §1 flights** — you never log in / solve captchas /
 book. Search shapes: `"<酒店名> 大众点评 评价"`, `"<酒店名> 携程 价格 <日期>"`, `"<品牌> <区域> 店 怎么样 测评"`.
 
@@ -131,8 +144,9 @@ Honest time accounting is what makes a plan usable. Rough stay durations (adjust
 | 正餐 | 60–90 min；排队店 +30–45 min |
 | 咖啡 / 小吃歇脚 | 30 min |
 
-Add **point-to-point transit** between stops (search or estimate honestly: city metro hops are often
-20–40 min door-to-door once you count walking + waiting) **plus a 15–20 min buffer** per transition.
+Add **point-to-point transit** between stops — **taxi cost/time and driving distance come from 高德
+路线规划, not from your head**; metro hops are often 20–40 min door-to-door once you count walking +
+waiting — **plus a 15–20 min buffer** per transition.
 A day that looks full on paper with zero buffer will run 1–2 hours late by afternoon — pad it.
 
 **Commute annotation + steps.** Record each inter-stop hop as **mode + distance + time** and put it in

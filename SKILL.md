@@ -90,9 +90,11 @@ Fit the itinerary to real arrival/departure times — but **only read, never boo
 2. **Flights — browser price check is MANDATORY (机票必须用浏览器查一遍).** A flight fare moves too much
    for a web_search number to be trusted, so for **every air leg** you must open the booking sites in a
    browser — **Claude in Chrome / Windows-MCP / Desktop Commander**, whichever is connected — and read
-   the **live** fare for the chosen flight/date on **several** platforms: 去哪儿 / 携程 / 飞猪 / 航司官网
-   (for international add **Google Flights / Skyscanner**, which need no login — prefer them to dodge
-   walls). Put those real, same-session prices + the exact query time into the `.price-compare` block,
+   the **live** fare for the chosen flight/date on **several** platforms: **携程 / 飞猪 / 航司官网（必查：
+   东航/国航/南航等实测可查，官网有券时更低）**（去哪儿/美团/同程/艺龙已废，别浪费时间——平台真值表见
+   `references/research-playbook.md`）。International: add **Google Flights / Skyscanner** (no login).
+   **国内机票价都是裸价**：预算必须用**含税总价**（燃油附加费 + 机建费），从官网/价格明细读出；读不到就标
+   「票面价 · 燃油/机建另计，以出票页为准」，不许编税费。 Put those real, same-session prices + the exact query time into the `.price-compare` block,
    cheapest tagged. This is **query-only** — obey the prohibitions below.
    - **At a login wall / captcha — defer it, don't block; batch all logins into ONE prompt.** You never
      enter passwords or solve captchas yourself. When a platform throws a login/captcha wall, **don't
@@ -101,7 +103,7 @@ Fit the itinerary to real arrival/departure times — but **only read, never boo
      it to a **"needs-login" list**, and **move on** — open and read every other platform (incl.
      login-free ones like Google Flights) first. **Only after all platforms are queried**, if the
      needs-login list is non-empty, ask the user **once**, listing them, e.g.: *"这几个要登录才能看完整价：
-     去哪儿、飞猪。我已把每个标签页都停在登录页了——请你一次性全部登录（我不会替你输密码或过验证码），都登好
+     飞猪、某航司官网。我已把每个标签页都停在登录页了——请你一次性全部登录（我不会替你输密码或过验证码），都登好
      告诉我，我再回去逐个读价。"* **Wait** for one confirmation, then go back and **read the now-accessible
      fares on each** previously-walled tab. (Batching beats pausing per-platform — the user logs in once,
      not N times.)
@@ -199,14 +201,15 @@ never justifies skipping the section.)
   - **Fake-review tells:** a burst of identical, generic, dateless 5★; a score wildly out of line with
     the written complaints; or all reviews old/stale. Treat these as untrustworthy.
   - **Cross-check platforms:** if one platform glows but others warn, **trust the warnings.**
+    高德地图的 POI 评价真实度高，适合做交叉信源（高德不显示房价）。
 - **Prefer chains (连锁) when they fit — especially for 银发/亲子** (consistent cleanliness, standards,
   easy recourse): **华住会** (汉庭/全季/桔子/星程/宜必思/美居), **锦江** (锦江之星/7天/维也纳), **首旅如家**
   (如家/和颐). But a chain is **not an auto-pick** — a specific branch with bad recent reviews is still
   out; **reviews override the brand.** A boutique/民宿 is fine if its reviews are strong, specific, and
   authentic and it suits the trip — just flag the higher variance.
-- **Multi-platform price compare — same as flights.** Browser-check the **per-night** price on several
-  platforms (携程 / 去哪儿 / 飞猪 / 美团; **集团官方 App often cheapest** — e.g. 华住会会员价; Booking/Agoda
-  for international), cheapest tagged, exact query time noted. **Use the same defer-and-batch login
+- **Multi-platform price compare — same as flights.** Browser-check the **per-night** price on
+  **携程 + 飞猪**（Booking/Agoda for international），评价交叉看**高德地图**（查不了价，但 POI 评价真实，
+  是可靠评论信源）。**别默认「集团 App 会员价更低」**——实测未必，且华住会官网查不到价；会员价只有真读到才写。 **Use the same defer-and-batch login
   handling and the query-only prohibitions from Step 2** (never log in / solve captchas yourself, never
   book). Trains/flights/hotels all share that flow.
 - **Output** each option as a **hotel card** (chain badge, 评分 + 点评数, 区域/到地铁/到当天景点群的距离, a
