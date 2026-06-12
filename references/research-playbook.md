@@ -25,9 +25,7 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    - 国内（**2026-06 实测平台真值表，省时间，别去碰已废的**）:
      - ✅ **携程** (`flights.ctrip.com` / `hotels.ctrip.com`) — 机票酒店免登录可读，台面价为裸价。
      - ✅ **飞猪** — 机票/酒店 web 均可用（需淘宝登录态；连续查询可能触发验证码 → 走登录墙协议）。
-       **机票必须用带全参数的 URL**，缺 `depDate`/城市三字码会报「入参校验失败」（别误判成已废）。模板：
-       `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity=SHA&arrCity=CTU&depDate=YYYY-MM-DD&depCityName=上海&arrCityName=成都`
-       酒店：`https://hotel.fliggy.com/hotel_list3.htm?cityName=成都&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords=酒店名`
+       机票 URL **必须带全参数**，缺 `depDate`/城市三字码会报「入参校验失败」——别误判成已废；模板见下方 URL 模板库。
        列表价均为**裸价**（机票表头自标「不含税费」）。
      - ✅ **航司官网**（**必查**，东航/国航/南航实测可查价，吉祥/春秋等多数也可）— 有优惠券时可能比 OTA 低，
        且官网能读到**含税总价**（见下条）。
@@ -38,9 +36,26 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    - 国际: **Google Flights**、**Skyscanner**、航司官网 — these need no login, so prefer them and they
      rarely hit a wall.
 
-   **燃油附加费 + 机场建设费（国内机票绝不可漏）：** 所有平台列表页显示的都是**裸票价**，不含
-   燃油附加费与机建费。预算表必须用**含税总价** — 在航司官网或平台的价格明细里读出实际税费；读不到就在
-   票价旁明确标注「票面价 · 燃油/机建另计，以出票页为准」，**绝不能自己编一个税费数**。
+   **燃油附加费 + 机场建设费（国内机票绝不可漏，且必须现查）：** 所有平台列表页显示的都是**裸票价**，
+   不含燃油附加费与机建费。预算表必须用**含税总价** — 优先读航司官网（页面价即含税）。需要自己折算时，
+   **燃油附加费随油价频繁调价（一年多次），绝不许用记忆值** — 先 `web_search "国内 燃油附加费 最新 调整"`
+   拿当前标准再算（例：2026-06-05 起 >800km ¥150/段、≤800km ¥80/段，机建费 ¥50/段——仅作记录，下次仍要现查），
+   并在页面上注明「按 YYYY-MM-DD 起执行标准」。读不到、查不到就标「票面价 · 燃油/机建另计，以出票页为准」，
+   **绝不能自己编一个税费数**。
+
+   **URL 模板库（实测可用 · 直接套用，省点击省 token；坏了就更新这里）：**
+   | 平台/用途 | 模板 |
+   |---|---|
+   | 携程机票（单程列表） | `https://flights.ctrip.com/online/list/oneway-{dep3字码}-{arr3字码}?depdate=YYYY-MM-DD&cabin=y_s` |
+   | 携程酒店（城市列表+日期） | `https://hotels.ctrip.com/hotels/list?city={城市id，成都=28}&checkin=YYYY/MM/DD&checkout=YYYY/MM/DD`（关键词用页内搜索框输入，URL 传参不生效） |
+   | 飞猪机票（单程列表） | `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity={dep3字码}&arrCity={arr3字码}&depDate=YYYY-MM-DD&depCityName={中文}&arrCityName={中文}` |
+   | 飞猪酒店（关键词+日期） | `https://hotel.fliggy.com/hotel_list3.htm?cityName={中文城市}&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords={酒店名}` |
+   | 吉祥官网（航班查询） | `https://www.juneyaoair.com/flightQuery?depCity={中文}-{3字码}&arrCity={中文}-{3字码}&depDate=YYYY-MM-DD&routeType=OW`（其余航司官网查询页结构各异，首次用 UI 搜索后**记下结果页 URL 存进这张表**） |
+   | 高德 POI 搜索（看评价/坐标） | `https://www.amap.com/search?query={关键词}&city={中文城市}` |
+   | 高德路线（起终点要 UI 选点） | 搜 POI → 点「路线」→ 改起点；结果含驾车里程/时长/过路费与公交方案+票价（无打车价，用里程×当地计价标准折算并注明来源） |
+
+   通用纪律：**每在一个新平台手动点出一次有效结果页，就回头看它的 URL——有规律就提炼成模板补进上表**，
+   下次直接 navigate，不再重复点击流程。
 3. Record each `platform → price` **with the exact query time**, put them in `.price-compare` (cheapest
    tagged `class="cheapest"`), and set `.tr-price` to "最低 ¥X".
 
