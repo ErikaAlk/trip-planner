@@ -93,8 +93,10 @@ Fit the itinerary to real arrival/departure times — but **only read, never boo
    the **live** fare for the chosen flight/date on **several** platforms: **携程 / 飞猪 / 航司官网（必查：
    东航/国航/南航等实测可查，官网有券时更低）**（去哪儿/美团/同程/艺龙已废，别浪费时间——平台真值表见
    `references/research-playbook.md`）。International: add **Google Flights / Skyscanner** (no login).
-   **国内机票价都是裸价**：预算必须用**含税总价**（燃油附加费 + 机建费），从官网/价格明细读出；读不到就标
-   「票面价 · 燃油/机建另计，以出票页为准」，不许编税费。 Put those real, same-session prices + the exact query time into the `.price-compare` block,
+   **国内机票全平台列表价均为裸价——无一例外，航司官网也是**（个别官网页面标着「含税总价」，订单页实测
+   仍另加机建+燃油，别被页头骗了）。预算必须用**含税总价 = 裸价 + 机建费 + 燃油附加费**；燃油费率随油价
+   频繁调价，先 web_search 最新标准再折算并注明执行日期；要看真实税费可进订单第一步的价格明细页（只读，
+   绝不提交）。读不到就标「票面价 · 燃油/机建另计，以出票页为准」，不许编税费。 Put those real, same-session prices + the exact query time into the `.price-compare` block,
    cheapest tagged. This is **query-only** — obey the prohibitions below.
    - **At a login wall / captcha — defer it, don't block; batch all logins into ONE prompt.** You never
      enter passwords or solve captchas yourself. When a platform throws a login/captcha wall, **don't
