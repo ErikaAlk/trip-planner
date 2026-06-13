@@ -1,0 +1,259 @@
+# 高效网页抓取方法（Claude in Chrome）
+
+> 适用：携程/飞猪机票、酒店价格，携程/高德酒店与民宿评论等动态网页。
+> 核心目标：用 **DOM/JS 提取** 替代 **截图认图**，把每次提取的 token 成本压到接近零，并拿到可直接落表的结构化数据。
+> 方法由用户用 Cowork 研究产出，本文档基于 4 个真实页面实测验证。
+
+> **复验记录（2026-06-13，本 skill 实机重测，结论：可行、采用）：**
+> - ✅ **携程机票** `.flight-box` + 字段选择器（`.flight-airline`/`.plane-No`/`.depart-box .time`/`.price`）——
+>   一次取 12 航班结构化 JSON，零截图。**唯一坑：首个 `.flight-box` 常是"X→Y 推荐位"广告，无航班字段；
+>   用 `.filter(f=>f.dep&&f.price)` 滤掉即可**（本文档模板已含该过滤）。
+> - ✅ **高德 POI 评价** `[class*="ReviewList_reviewItem__"]`——取 30 条带作者+日期+正文，**纯 JS、零 canvas
+>   报错**。这直接解决了之前几轮高德"截图报参数错/SSR 不渲染"的痛点：**评价在 HTML 面板里、JS 抓得到，
+>   只有背景地图是 canvas**。以后高德评论一律走 JS，不要再靠截图认图、更不要因截图失败就下"没评价"结论。
+> - ✅ **携程酒店点评** `[class*="reviewSwiper_reviewSwiper-item"]` 选择器命中；评分/点评数可用
+>   `innerText.match(/[1-5]\.\d/)` 与 `/\d[\d,]+\s*条点评/` 取（注意区分总分 vs 分项分，必要时定位到顶部评分块）。
+> - ⚠️ **飞猪机票** `tr.flight-item-tr` 沿用 Cowork 实测（本轮飞猪站点不可达未复验）；站点能开时按模板抓。
+
+---
+
+## 一、核心原则
+
+**能用 JS 读 DOM，就别截图。**
+
+截图（`computer` 的 screenshot）一张约 1000+ token，而且会一直留在上下文里，多翻几页就「上下文爆炸」。相比之下，`javascript_tool` 只返回你提取的那几个字段，成本极低，数据还是结构化的。
+
+工具优先级（成本由低到高）：
+
+1. **`javascript_tool`** —— 知道选择器时首选，`querySelector` 精确取数，返回 JSON。
+2. **`get_page_text`** —— 只要正文文本（文章类）时用。
+3. **`read_page`** —— 需要理解页面结构 / 拿元素引用时用（无障碍树，约 800 token，复杂页可能上万，慎用）。
+4. **`find`** —— 自然语言定位某个按钮/输入框。
+5. **`computer` 截图** —— 只在以下情况用：① 确认页面是否加载完；② DOM 取不到、需要看视觉；③ canvas 渲染的内容（如地图）。
+
+---
+
+## 二、标准三步工作流
+
+任何一个新页面，都按这三步走，**全程通常只截 1 张图**：
+
+### 步骤 1 — 导航 + 1 张图确认加载
+
+```
+navigate → wait(5s) → screenshot   ← 用 browser_batch 合并成一次调用
+```
+
+只截这一张，确认页面渲染出来了、是否需要登录、数据大概在哪。
+
+### 步骤 2 — 探测结构（关键）
+
+不要靠猜类名。用一段「探测脚本」自动找出重复卡片的容器类名：
+
+```javascript
+(() => {
+  const all = Array.from(document.querySelectorAll('div,li,tr,p'));
+
+  // A. 从一个已知文本（如某航班号/某句评论）回溯父级，看它在什么容器里
+  const el = all.find(e => e.children.length === 0 && /已知关键词/.test(e.textContent));
+  let node = el, path = [];
+  for (let i=0; i<7 && node; i++){ path.push((node.className||'').toString().slice(0,55)); node = node.parentElement; }
+
+  // B. 统计「出现 N 次」的可疑列表类名（重复 = 列表项）
+  const counts = {};
+  all.forEach(e => (e.className||'').toString().split(/\s+/).forEach(k => {
+    if (/flight|item|row|list|card|review|comment|content|user/i.test(k)) counts[k] = (counts[k]||0)+1;
+  }));
+  const candidates = Object.entries(counts).filter(([,n]) => n>=3 && n<80).sort((a,b)=>b[1]-a[1]).slice(0,15);
+
+  return JSON.stringify({ path, candidates }, null, 1);
+})()
+```
+
+出现次数稳定（如 6 次、16 次、111 次）且语义相关的类名，就是「每条记录」的容器。
+
+### 步骤 3 — 批量提取成 JSON
+
+锁定容器后，对每个容器内部 `querySelector` 取字段，返回数组。见下方各站点模板。
+
+---
+
+## 三、两个最重要的技巧
+
+### 技巧 1：CSS-modules 哈希类名 → 用「前缀/包含匹配」
+
+携程酒店点评、高德评价用的是构建工具生成的哈希类名，例如：
+
+```
+ReviewList_reviewItem__KQ37n      高德
+reviewSwiper_reviewItem-content__HB2hC   携程
+```
+
+`__KQ37n` 这种后缀**每次发版都会变**，写死必废。用属性包含选择器只匹配稳定的前缀：
+
+```javascript
+// ✅ 稳定
+document.querySelectorAll('[class*="ReviewList_reviewItem__"]')
+document.querySelectorAll('[class*="reviewItem-content"]')
+
+// ❌ 易碎
+document.querySelectorAll('.ReviewList_reviewItem__KQ37n')
+```
+
+> 经验：携程机票（`.flight-box`）、飞猪机票（`.flight-item-tr`）用的是**普通稳定类名**，可直接写；
+> 携程酒店点评、高德评价是 **CSS-modules 哈希**，必须前缀匹配。
+
+### 技巧 2：懒加载 / 虚拟滚动 → 用 JS 滚动循环触发
+
+有的页面一次性把全部数据塞进 DOM，有的边滚边加载。先判断，再决定要不要滚：
+
+```javascript
+(async () => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  let last = 0;
+  for (let i=0; i<15; i++){
+    window.scrollTo(0, document.body.scrollHeight);
+    await sleep(700);
+    const n = document.querySelectorAll('选择器').length;
+    if (n === last && i > 2) break;   // 数量不再增长 → 加载完
+    last = n;
+  }
+  window.scrollTo(0, 0);
+  return last;
+})()
+```
+
+> 实测：**携程机票**虚拟滚动，初始只 6 条，需滚动加载；**飞猪机票**一次性渲染全部 111 条，无需滚动。
+
+---
+
+## 四、各站点实测模板（可直接复用）
+
+### 1. 携程机票列表
+
+- 容器：`.flight-box`（稳定类名）
+- 需要滚动懒加载
+- 内部字段：`.flight-airline` / `.plane-No` / `.depart-box .time` / `.depart-box .airport` / `.arrive-box .time` / `.arrive-box .airport` / `.price` / `.flight-tag`
+
+```javascript
+Array.from(document.querySelectorAll('.flight-box')).map(b => ({
+  airline:    b.querySelector('.flight-airline')?.textContent.trim(),
+  flightNo:   b.querySelector('.plane-No')?.textContent.trim(),
+  dep:        b.querySelector('.depart-box .time')?.textContent.trim(),
+  depAirport: b.querySelector('.depart-box .airport')?.textContent.trim(),
+  arr:        b.querySelector('.arrive-box .time')?.textContent.trim(),
+  arrAirport: b.querySelector('.arrive-box .airport')?.textContent.trim(),
+  price:     (b.querySelector('.price')?.textContent || '').replace(/起|\s/g,''),
+  tags: Array.from(b.querySelectorAll('.flight-tag, .tag')).map(e=>e.textContent.trim())
+}));
+```
+
+### 2. 飞猪机票列表
+
+- 容器：`tr.flight-item-tr`（稳定类名），**一次性全部渲染，无需滚动**
+- 单元格：`.flight-line`（航司+航班号+机型）/ `.flight-time`（含起降，正则抓 `\d{1,2}:\d{2}`）/ `.flight-port`（起降机场）/ `.flight-price`
+- 注意：飞猪价格是**不含税费**的起价；行有隐藏副本，用 `offsetParent!==null` 过滤可见行 + 按航班号去重
+
+```javascript
+(() => {
+  const rows = Array.from(document.querySelectorAll('tr.flight-item-tr')).filter(r => r.offsetParent !== null);
+  const seen = new Set();
+  return rows.map(r => {
+    const line  = (r.querySelector('.flight-line')?.textContent || '').replace(/\s+/g,' ').trim();
+    const times = (r.querySelector('.flight-time')?.textContent || '').match(/\d{1,2}:\d{2}/g) || [];
+    const ports = (r.querySelector('.flight-port')?.textContent || '').replace(/\s+/g,' ').trim()
+                    .split(/\s+(?=白云|虹桥|浦东|宝安)/);
+    return {
+      info: line,                                   // 例 "春秋9C8930 中型机 321"
+      dep: times[0], arr: times[1],
+      depAirport: ports[0], arrAirport: ports[1],
+      price:    (r.textContent.match(/¥\s*\d+/) || [])[0],
+      discount: (r.textContent.match(/[\d.]+折/) || [])[0]
+    };
+  }).filter(f => { const k = f.info + f.dep; if (seen.has(k)) return false; seen.add(k); return true; });
+})();
+```
+
+### 3. 携程酒店点评
+
+- 详情页向下滚动加载点评区
+- 容器：`[class*="reviewSwiper_reviewSwiper-item__"]`（**CSS-modules 哈希，前缀匹配**）
+- 字段前缀：`reviewItem-userName` / `reviewItem-userReviewTime` / `reviewItem-content`
+- **坑**：① 用户名里被插入**零宽字符**（`​`/`‍` 等），需 strip；② 轮播 + 列表有重复，需**去重**；③ 长评论尾部有「全文」按钮，需展开取全文
+- 抓全部 1465 条：点「显示所有点评」展开弹层，弹层内翻页/滚动，选择器策略相同
+
+```javascript
+(() => {
+  const strip = s => (s || '').replace(/[​-‏‪-‮⁠﻿]/g, '').trim();
+  const items = [...new Set(
+    Array.from(document.querySelectorAll('[class*="reviewSwiper_reviewSwiper-item__"]'))
+  )];
+  const pick = (it, frag) => it.querySelector(`[class*="${frag}"]`)?.textContent.trim().replace(/\s+/g,' ');
+  const seen = new Set();
+  return items.map(it => ({
+    user:    strip(pick(it, 'reviewItem-userName')),
+    time:    pick(it, 'reviewItem-userReviewTime'),
+    content: pick(it, 'reviewItem-content')
+  })).filter(r => r.content && !seen.has(r.content) && seen.add(r.content));
+})();
+```
+
+### 4. 高德地图 POI 评价
+
+- POI 详情面板是 **HTML 可抓**；背景地图是 **canvas，读不出**（要地图视觉信息才截图）
+- 容器：`[class*="ReviewList_reviewItem__"]`（**CSS-modules 哈希，前缀匹配**）
+- 字段前缀：`ReviewList_authorName` / `ReviewList_reviewTime` / `ReviewList_reviewText`
+- 长评价尾部同样有「全文」
+
+```javascript
+Array.from(document.querySelectorAll('[class*="ReviewList_reviewItem__"]')).map(it => {
+  const pick = frag => it.querySelector(`[class*="${frag}"]`)?.textContent.trim().replace(/\s+/g,' ');
+  return {
+    author: pick('ReviewList_authorName'),
+    time:   pick('ReviewList_reviewTime'),
+    text:   pick('ReviewList_reviewText'),
+    images: it.querySelectorAll('[class*="imageWrapper"] img').length
+  };
+});
+```
+
+---
+
+## 五、通用注意事项 / 反爬坑
+
+- **登录态**：用的是用户本地已登录的 Chrome 会话，所以能拿到价格、评价等需登录内容。飞猪反爬比携程严，更依赖登录态。
+- **零宽字符**：携程用户名等字段插入不可见字符干扰，统一用 `replace(/[​-‏‪-‮⁠﻿]/g,'')` 清洗。
+- **「全文」截断**：长评论默认折叠，文本尾部带「全文」。需完整内容时先用 JS 点击所有展开按钮再提取。
+- **去重**：轮播区 + 完整列表常有重复，按内容或唯一 id 去重。
+- **canvas 内容读不出**：地图、部分图表是 canvas 绘制，DOM 里没有文字 —— 这类只能截图，但其旁边的 HTML 信息面板照常 JS 抓。
+- **哈希类名优先前缀匹配**；普通类名可直接写。
+- **判断是否懒加载**：先取一次数量，滚动后再取，数量变了就是懒加载。
+- **价格口径**：注意「起价 / 含税 / 不含税」差异（飞猪显示不含税费）。
+
+---
+
+## 六、给 Skill 的提示词建议
+
+把下面这段写进 skill 的指令，让它默认走高效路径：
+
+```
+抓取网页数据时优先用 javascript_tool 读 DOM，不要用截图认图。
+流程：① navigate + wait + 1 张截图确认加载（用 browser_batch 合并）；
+② 先跑一段探测脚本，统计重复出现的列表项类名，定位记录容器；
+③ 对容器内部用 querySelector 批量提取成 JSON 返回。
+遇到形如 Name_part__hash 的 CSS-modules 哈希类名，一律用 [class*="稳定前缀"] 包含匹配，不要写死哈希后缀。
+列表若懒加载，用 JS 滚动循环触发直到数量不再增长。
+清洗零宽字符，处理「全文/加载更多」展开，按内容去重。
+只有 canvas 内容或确需视觉确认时才截图。
+能两步以上预判的操作，用 browser_batch 合并成一次调用减少往返。
+```
+
+---
+
+## 七、本次实测结果速览
+
+| 场景 | URL 类型 | 容器选择器 | 类名类型 | 加载方式 | 实测条数 |
+|---|---|---|---|---|---|
+| 携程机票 | flights.ctrip.com | `.flight-box` | 普通稳定 | 虚拟滚动懒加载 | 12（滚动加载更多） |
+| 飞猪机票 | sjipiao.fliggy.com | `tr.flight-item-tr` | 普通稳定 | 一次性全渲染 | 111 |
+| 携程酒店点评 | hotels.ctrip.com | `[class*="reviewSwiper-item"]` | CSS-modules 哈希 | 滚动加载 | 预览若干（全部需展开弹层） |
+| 高德 POI 评价 | amap.com | `[class*="ReviewList_reviewItem__"]` | CSS-modules 哈希 | 面板内 | 16 |

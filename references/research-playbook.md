@@ -109,6 +109,14 @@ the HTML rather than guessing.
 Use **Claude in Chrome** or **Windows-MCP** (whichever is installed) **only** to read live
 availability / exact fares on 携程 / 飞猪 / 航司官网 / 12306. It is a read-only lookup, not a booking flow.
 
+**抓数优先用 `javascript_tool` 读 DOM，别用截图认图（省 token + 解决高德 canvas 报错）。** 完整方法、
+探测脚本、各站点实测选择器模板见 **`references/scraping-method.md`**（已 2026-06-13 复验）。三步：① navigate +
+wait + **1 张**截图确认加载；② 跑探测脚本定位重复卡片的容器类名；③ 对容器 `querySelector` 批量提取成 JSON。
+要点：CSS-modules 哈希类名（携程点评/高德评价）用 `[class*="稳定前缀"]` 包含匹配、别写死哈希后缀；懒加载用
+JS 滚动循环；清零宽字符、按内容去重；**高德评价在 HTML 面板里(JS 可抓)，只有背景地图是 canvas(才截图)**。
+已验证选择器：携程机票 `.flight-box`（滤掉首个广告位）、高德评价 `[class*="ReviewList_reviewItem__"]`、
+携程点评 `[class*="reviewSwiper_reviewSwiper-item"]`。
+
 **Stop-and-hand-back triggers (do not cross these):**
 - Login / account / password prompt → stop.
 - CAPTCHA / 验证码 / 滑块 / 人机验证 → stop (never solve or bypass).

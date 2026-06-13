@@ -109,7 +109,8 @@ trip-planner/
 ├── SKILL.md                        # 工作流:需求采集 → 交通 → 天气/真实数据 → 编排 → 住宿 → 输出
 ├── references/
 │   ├── design-system.md            # HTML 输出规范(脚手架/CSS/JS + 全部组件)
-│   └── research-playbook.md        # 检索/浏览器比价/选酒店方法
+│   ├── research-playbook.md        # 检索/浏览器比价/选酒店方法
+│   └── scraping-method.md          # 高效抓取(JS读DOM替代截图)+各站点实测选择器模板
 ├── scripts/
 │   ├── check_html.py               # 输出静态校验(地图/坐标/住宿/预算/清单/自包含)
 │   └── make_showcase.sh            # 从真实产物重新生成 README 截图(可复现)
@@ -132,6 +133,8 @@ python3 scripts/check_html.py <输出>.html      # macOS/Linux
 校验器检查:`<div>` 平衡、Leaflet 接线、每个地图点的数字坐标、无模板残留、自包含、以及旅行组件是否真实落地(≥3 住宿卡/预算表/清单)。对照实验方法与数据见 [evals/benchmark.md](evals/benchmark.md)。
 
 ## 更新记录
+
+- **2026-06-13 · v0.14** — 采用用户用 Cowork 研究的**高效抓取方法**(`references/scraping-method.md`):查价/查评论优先用 `javascript_tool` 读 DOM 取结构化 JSON、不再截图认图——**省 token,且绕开高德 canvas 截图报错**(评价在 HTML 面板、地图才是 canvas,这正是 test-4/5 高德翻车的根因)。本轮实机复验三个核心模板全通过:携程机票 `.flight-box`(滤掉首个广告位)取 12 航班、高德评价 `[class*="ReviewList_reviewItem__"]` 取 30 条零截图、携程点评 `[class*="reviewSwiper_reviewSwiper-item"]` 选择器命中;CSS-modules 哈希类名一律用前缀包含匹配。方法 + 探测脚本 + 各站点模板沉淀进 references,SKILL.md/playbook 加了默认走 JS 抓取的指引。
 
 - **2026-06-12 · v0.13** — 第五次测试(大理)全 11 项 PASS:飞猪/高德都遇真站点故障(404/504、canvas 报错),模型**老实标注没编**,飞猪闸正确放行了真墙(超时)、只拦甩锅——诚实降级这条主线闭环。补两处:① **携程机票 URL 换成用户实测的稳定格式** oneway-{dep}-{arr}?_=1&depdate=Y-M-D&cabin=Y_S_C_F(旧格式常渲染不出要手动点),记进模板表。② **小红书提为 Step 3 必做**——之前埋在 playbook 当可选项、test-5 零搜索;现在每趟必搜一次,带软广鉴别(只采多篇互证的具体经验),结果写进 poi-tip/tip。
 
