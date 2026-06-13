@@ -48,7 +48,7 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    **URL 模板库（实测可用 · 直接套用，省点击省 token；坏了就更新这里）：**
    | 平台/用途 | 模板 | 实测注意（碰过的壁） |
    |---|---|---|
-   | 携程机票（单程列表） | `https://flights.ctrip.com/online/list/oneway-{dep3字码}-{arr3字码}?depdate=YYYY-MM-DD&cabin=y_s` | 免登录可读 |
+   | 携程机票（单程列表） | `https://flights.ctrip.com/online/list/oneway-{出发IATA小写}-{到达IATA小写}?_=1&depdate=YYYY-MM-DD&cabin=Y_S_C_F` | **用户实测的稳定格式**：`?_=1&` 缓存破坏 + `cabin=Y_S_C_F`（全舱）。例：广州→三亚 `oneway-can-syx?_=1&depdate=2026-10-14&cabin=Y_S_C_F`。旧写法 `?depdate=...&cabin=y_s` 常渲染不出、得手动点，**别再用** |
    | 携程酒店（城市列表+日期） | `https://hotels.ctrip.com/hotels/list?city={城市数字id}&checkin=YYYY/MM/DD&checkout=YYYY/MM/DD` | **city id 用错会静默返回「找到0家」**（曾把厦门错填 18→0 家）。常见 id：北京1·上海2·厦门25·成都28·杭州17·广州32·深圳30·西安10；**不确定就先在框里输城市名让它解析**。**keyword 参数不过滤**——酒店名一律在页内搜索框输入 |
    | 飞猪机票（单程列表） | `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity={dep3字码}&arrCity={arr3字码}&depDate=YYYY-MM-DD&depCityName={中文}&arrCityName={中文}` | 缺 depDate/三字码报「入参校验失败」（≠已废） |
    | 飞猪酒店（关键词+日期） | `https://hotel.fliggy.com/hotel_list3.htm?cityName={中文城市}&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords={酒店名}` | 连续查可能触发验证码墙 |

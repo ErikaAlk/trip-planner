@@ -211,6 +211,12 @@ More detail and copy-paste search patterns: **`references/research-playbook.md`*
   for every attraction and recommended restaurant. If a fact can't be confirmed, mark it
   "以官网为准" rather than inventing it. Wrong hours that send the traveler to a closed door are the
   worst failure this skill can produce.
+- **小红书攻略 — 每趟都搜一遍，不是可选项（用户反复要求，且产物里经常被漏掉）。** 至少跑一次
+  `web_search "<目的地> 攻略 小红书"` / `"<目的地> <主题/人群> 避雷 小红书"`，捞本地玩法、出片机位、
+  排队/避坑、亲子或银发实操。**但必须鉴别软广**：通篇只夸、出现「合作/赞助/探店/团购券/到店报暗号」、
+  统一话术配统一滤镜、引导私信下单的当广告打折；**只采被多篇独立笔记重复印证的具体经验**（如"X点后不排队"），
+  单篇热帖不作准，硬事实（票价/时间）仍以官网为准。把采到的写进相关 POI 的 `poi-tip` 或 `tip` callout。
+  详见 `references/research-playbook.md` §1 的鉴别清单。
 
 ---
 
