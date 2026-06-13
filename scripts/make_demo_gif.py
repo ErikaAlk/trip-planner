@@ -35,7 +35,7 @@ CHROME = next((p for p in [
 
 def render_fullpage(html, png):
     url = "file:///" + os.path.abspath(html).replace("\\", "/")
-    subprocess.run([CHROME, "--headless", "--disable-gpu", "--hide-scrollbars",
+    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                     "--force-device-scale-factor=1", "--virtual-time-budget=12000",
                     f"--window-size={RENDER_W},16000", f"--screenshot={os.path.abspath(png)}", url],
                    check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

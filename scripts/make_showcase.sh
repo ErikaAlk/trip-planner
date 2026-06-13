@@ -36,12 +36,20 @@ else
 fi
 
 shot() { # shot <outfile> <WxH> <url>
-  "$BROWSER" --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+  # --headless=new is REQUIRED for narrow (mobile) widths: the old headless mode
+  # lays the page out at a wider viewport and clips the screenshot to the window,
+  # truncating the right edge. New headless honors the real device-width viewport.
+  "$BROWSER" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
     --virtual-time-budget=9000 --window-size="$2" --screenshot="$(command -v cygpath >/dev/null 2>&1 && cygpath -w "$PWD/$1" || echo "$PWD/$1")" \
     "$3" 2>/dev/null
   echo "wrote $1"
 }
 
 shot "$OUT/hero-desktop.png" "1280,1700"  "$URL"
-shot "$OUT/mobile.png"       "390,1500"   "$URL"
 shot "$OUT/full.png"         "1280,16000" "$URL"
+
+# mobile.png is NOT a plain --window-size=390 shot: headless misrenders a narrow
+# top-level viewport on hi-DPI displays (right edge truncates). Use the iframe-
+# wrapper renderer instead (desktop top-level + a 390px sub-frame = true mobile).
+py "$(dirname "$0")/make_mobile_shot.py" "$HTML" "$OUT/mobile.png" 2>/dev/null \
+  || python3 "$(dirname "$0")/make_mobile_shot.py" "$HTML" "$OUT/mobile.png"
