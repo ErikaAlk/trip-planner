@@ -6,6 +6,7 @@
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-trip--planner-blueviolet)](SKILL.md)
 [![skills.sh](https://img.shields.io/badge/skills.sh-Eric6286%2Ftrip--planner-ff4d4f)](https://skills.sh/Eric6286/trip-planner)
+[![ClawHub](https://img.shields.io/badge/ClawHub-eric6286%2Ftrip--planner-7c3aed)](https://clawhub.ai/eric6286/trip-planner)
 [![Runtime](https://img.shields.io/badge/Claude%20Code-ready-blue)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -17,8 +18,8 @@
 
 ---
 
-![成都4日游行程页首屏:主题化头部 + 行程概览 + Leaflet 地图](assets/hero-desktop.png)
-<sub>真实运行产物(成都 4 日银发亲子行程),非设计稿。完整文件见 [examples/成都4日游行程.html](examples/成都4日游行程.html)。</sub>
+![成都4日游行程页 demo:主题头 → 活地图 → 住宿评论体检的滚动演示](assets/demo.gif)
+<sub>真实运行产物(成都 4 日银发亲子行程)滚动演示,非设计稿。GIF 由 `scripts/make_demo_gif.py` 从真页面重生成。完整文件见 [examples/成都4日游行程.html](examples/成都4日游行程.html)。</sub>
 
 ---
 
