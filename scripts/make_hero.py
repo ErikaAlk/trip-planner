@@ -98,7 +98,7 @@ html,body{{width:1280px;height:640px;overflow:hidden;font-family:"Microsoft YaHe
 .eyebrow{{display:inline-flex;align-items:center;gap:8px;color:#34e0c4;font-size:13px;font-weight:700;
   letter-spacing:.16em;margin-bottom:18px}}
 .eyebrow b{{width:18px;height:2px;background:#34e0c4;display:inline-block}}
-h1{{font-size:42px;line-height:1.18;font-weight:800;color:#f4f7fd;letter-spacing:-.5px}}
+h1{{font-size:39px;line-height:1.22;font-weight:800;color:#f4f7fd;letter-spacing:-.5px}}
 h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-clip:text;background-clip:text;color:transparent}}
 .sub{{margin-top:16px;font-size:15.5px;line-height:1.7;color:#9fb0cc;max-width:380px}}
 .pills{{margin-top:26px;display:flex;flex-wrap:wrap;gap:9px;max-width:400px}}
@@ -117,14 +117,12 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
   gap:7px;padding:0 13px;border-bottom:1px solid rgba(255,255,255,.06)}}
 .tl{{width:11px;height:11px;border-radius:50%}}
 .browser .shot{{width:100%;height:360px;object-fit:cover;object-position:top}}
-/* iPhone 17 Pro Max — thin uniform titanium bezel, big radius, 19.5:9, Dynamic Island */
-.phone{{position:absolute;left:606px;top:150px;width:212px;height:460px;border-radius:50px;
-  background:linear-gradient(150deg,#2a2f37,#0c0f15 30%,#0c0f15 70%,#23272e);padding:5px;
-  box-shadow:0 44px 72px -18px rgba(0,0,0,.8),0 0 62px -6px rgba(232,144,47,.5),
-    inset 0 0 0 1px rgba(255,255,255,.10);transform:rotateY(-13deg);z-index:6}}
-.screen{{position:relative;width:100%;height:100%;border-radius:45px;overflow:hidden;background:#0b111c}}
-.island{{position:absolute;left:50%;top:11px;transform:translateX(-50%);width:84px;height:25px;
-  border-radius:14px;background:#000;z-index:3;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}}
+/* clean minimal phone — thin uniform near-black bezel, big radius, no island */
+.phone{{position:absolute;left:606px;top:150px;width:210px;height:456px;border-radius:44px;
+  background:#0a0d14;padding:6px;
+  box-shadow:0 44px 72px -18px rgba(0,0,0,.8),0 0 58px -8px rgba(232,144,47,.42),
+    inset 0 0 0 1.5px rgba(255,255,255,.07);transform:rotateY(-13deg);z-index:6}}
+.screen{{position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;background:#0b111c}}
 .phone .shot{{width:100%;height:100%;object-fit:cover;object-position:top;display:block}}
 
 .foot{{position:absolute;left:66px;bottom:30px;font-size:12.5px;color:#5d6c87;letter-spacing:.04em;z-index:5}}
@@ -149,8 +147,8 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
 
   <div class="copy">
     <span class="eyebrow"><b></b>TRIP-PLANNER · CLAUDE CODE SKILL</span>
-    <h1>把"抄来的攻略"<br>变成<span class="hl">查证过的行程页</span></h1>
-    <p class="sub">网上抄来的攻略,会把你送到闭馆的大门口。<br>这个 skill 跑遍携程/飞猪/高德实查,查不到就标注、绝不编造。</p>
+    <h1>查过的才叫<span class="hl">行程</span>,<br>没查过的叫愿望清单。</h1>
+    <p class="sub">跑遍携程 / 飞猪 / 高德实查机酒、读真实评论;<br>查不到就标注,绝不编造一个数字。</p>
     <div class="pills">
       <span class="pill"><span class="dot" style="background:#34e0c4"></span>内嵌活地图</span>
       <span class="pill"><span class="dot" style="background:#f5b14c"></span>实价比价</span>
@@ -167,7 +165,7 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
       </div>
       <img class="shot" src="{desk}">
     </div>
-    <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="{mob}"></div></div>
+    <div class="phone"><div class="screen"><img class="shot" src="{mob}"></div></div>
   </div>
 
   <div class="vig"></div>
