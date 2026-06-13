@@ -5,6 +5,7 @@
 > *「网上抄来的攻略,会把你送到闭馆的大门口。」*
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-trip--planner-blueviolet)](SKILL.md)
+[![skills.sh](https://img.shields.io/badge/skills.sh-Eric6286%2Ftrip--planner-ff4d4f)](https://skills.sh/Eric6286/trip-planner)
 [![Runtime](https://img.shields.io/badge/Claude%20Code-ready-blue)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -56,6 +57,14 @@
 成本如实说:with-skill 约 2× tokens 和耗时(~10 万 tokens / 7–8 分钟)——这是真检索 + 完整结构化构建的价格。
 
 ## 快速开始
+
+一行安装(推荐):
+
+```bash
+npx skills add Eric6286/trip-planner
+```
+
+或手动克隆:
 
 ```bash
 git clone https://github.com/Eric6286/trip-planner ~/.claude/skills/trip-planner
