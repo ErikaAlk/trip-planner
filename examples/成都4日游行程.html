@@ -357,6 +357,53 @@ details[open] summary::before{transform:rotate(90deg);}
   text-transform:uppercase;letter-spacing:0.08em;
   padding:0 14px 5px;border-bottom:1px solid var(--border);margin-bottom:3px;
 }
+
+/* ── Mobile adaptation (≤640px) ── phones get tighter spacing, stacked transport
+   routes, wrapped price rows and a full-width floating nav. Required on every trip page;
+   check_html.py fails the build without it. */
+@media(max-width:640px){
+  .page{padding:16px 12px 76px;}
+  body>*:not(.page){padding-left:12px;padding-right:12px;}
+  .header{padding:30px 16px 24px;margin-bottom:28px;border-radius:13px;}
+  .header h1{font-size:21px;letter-spacing:0;line-height:1.35;}
+  .header .subtitle{font-size:12.5px;margin-bottom:13px;}
+  .tags{gap:6px;}
+  .tag{padding:4px 10px;font-size:11.5px;}
+  .toc{padding:14px 13px;margin-bottom:28px;}
+  .section{margin-bottom:38px;}
+  .section-header{gap:10px;margin-bottom:15px;padding-bottom:10px;}
+  .section-num{min-width:30px;height:30px;font-size:12.5px;}
+  .section h2{font-size:18.5px;}
+  .card{padding:14px 13px;}
+  .card h3{font-size:15.5px;}
+  .callout{padding:11px 11px;gap:9px;margin:11px 0;}
+  table{font-size:12.5px;}
+  th,td{padding:7px 7px;}
+  .poi .poi-head{gap:8px;}
+  .transport{padding:13px 13px;}
+  .transport .tr-route{flex-direction:column;align-items:flex-start;gap:3px;}
+  .transport .tr-node{display:flex;align-items:baseline;gap:8px;text-align:left;min-width:0;}
+  .transport .tr-node .t-time{font-size:16px;}
+  .transport .tr-arrow{flex:none;width:auto;text-align:left;border:none;padding-left:24px;}
+  .transport .tr-arrow span{position:static;background:none;padding:0;}
+  .transport .tr-arrow span::before{content:"↓ ";}
+  .pc-row{flex-direction:column;align-items:flex-start;gap:1px;padding:6px 0;
+    border-bottom:1px dotted var(--border);}
+  .pc-row:last-child{border-bottom:none;}
+  .transit{flex-wrap:wrap;}
+  .hotel{padding:12px 11px;}
+  .hotel .h-rating{margin-left:0;width:100%;}
+  .checklist{padding:11px 13px;}
+  #map{height:320px;}
+  #nav-btn{right:12px;bottom:12px;}
+  #nav-panel{left:12px;right:12px;width:auto;bottom:54px;max-height:55vh;}
+  html,body{max-width:100%;overflow-x:hidden;}
+  .transit .tpill,.chip,.hotel .h-rating,.meta-chip{white-space:normal;}
+  .transit{margin-left:0;margin-right:0;}
+  .header,.toc,.card,.callout,.transport,.hotel,.poi,.checklist,.day-meta,.tags,.price-compare{
+    max-width:100%;box-sizing:border-box;}
+  .header *,.card *,.callout *{max-width:100%;box-sizing:border-box;overflow-wrap:break-word;}
+}
 </style>
 </head>
 <body>

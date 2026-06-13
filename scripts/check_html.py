@@ -19,6 +19,9 @@ Checks (each FAIL must be fixed before presenting the file):
                                table, and a .checklist wired to localStorage.
                                Step 5 being silently dropped is the skill's
                                most common real-run failure — this catches it.
+  7. Mobile adaptation         a viewport meta tag AND a max-width media
+                               query block (phones must not get the raw
+                               desktop layout).
 
 Exit code: 0 = clean, 1 = one or more FAILs.  Pure standard library.
 """
@@ -140,6 +143,20 @@ def check_travel_components(html):
     return problems
 
 
+def check_mobile(html):
+    problems = []
+    if not re.search(r'<meta\s+name="viewport"', html):
+        problems.append('no <meta name="viewport"> tag — phones will render the desktop layout zoomed out')
+    m = re.search(r"@media\s*\(\s*max-width\s*:\s*6\d{2}px\s*\)\s*\{(.*?)\n\}", html, re.S)
+    if not m:
+        problems.append("no phone-breakpoint @media (max-width:6xxpx) block — page is not adapted "
+                        "for narrow screens (the design system ships a canonical 640px block)")
+    elif m.group(1).count("{") < 10:
+        problems.append("the max-width @media block is too thin (<10 rules) — copy the full mobile "
+                        "block from references/design-system.md")
+    return problems
+
+
 def check_self_contained(html):
     problems = []
     for m in re.finditer(r'<img\b[^>]*\bsrc\s*=\s*"(https?://[^"]+)"', html, re.I):
@@ -174,6 +191,7 @@ def run(path):
         ("no leftover KaTeX", check_no_katex(html)),
         ("self-contained", check_self_contained(html)),
         ("travel components (hotel/budget/checklist)", check_travel_components(html)),
+        ("mobile adaptation (viewport + media query)", check_mobile(html)),
     ]:
         if probs:
             fails += 1
