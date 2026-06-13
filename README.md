@@ -134,6 +134,8 @@ python3 scripts/check_html.py <输出>.html      # macOS/Linux
 
 ## 更新记录
 
+- **2026-06-13 · v0.16** — 小红书也纳入高效抓取(`scraping-method.md` §六点五,用户补充+本轮复验):搜索列表 `.note-item` 实测取到 20–22 条带标题/作者/点赞——**这一层通常就够攻略佐证**(多篇互证 + 点赞判热度 + 标题鉴别软广)。复验发现一个真坑:**含 xsec_token 的笔记链接会被 harness 隐私防护拦**(`[BLOCKED: Cookie/query string data]`),所以**别抽 token URL 再导航,要直接点击 note 打开浮层**(token 在点击里走);笔记浮层正文/评论要 scope 到 `.note-detail-mask` 防串数据。五条反爬约束(登录态/token/浮层/防滑块/视频笔记)都写进文档。
+
 - **2026-06-13 · v0.15** — 回答"选择器会不会过期":会。给 scraping-method.md 加「抗失效设计」(§八)——**保存的选择器只是"自检缓存",真正耐久的是"锚定内容(¥价 / HH:MM / 日期 / 航班号)而非类名"**(数据的形状稳,CSS 外壳才churn)。耐久阶梯 + 自愈四层:缓存选择器 → 探测+内容锚定通用提取(不依赖类名,附可运行模板)→ get_page_text 语义兜底 → 截图;并把 XHR/JSON 拦截列为可选"黄金耐久"路径(接口比 UI 稳)。纪律:失效是常态不是事故——选择器过期只让这次慢一点(多跑探测),绝不让数据变假(取不到就标"未读到·以官网为准",数据诚信契约照常)。SKILL.md/playbook 指明取 0 条要按 §八 自愈、别干等别放弃。
 
 - **2026-06-13 · v0.14** — 采用用户用 Cowork 研究的**高效抓取方法**(`references/scraping-method.md`):查价/查评论优先用 `javascript_tool` 读 DOM 取结构化 JSON、不再截图认图——**省 token,且绕开高德 canvas 截图报错**(评价在 HTML 面板、地图才是 canvas,这正是 test-4/5 高德翻车的根因)。本轮实机复验三个核心模板全通过:携程机票 `.flight-box`(滤掉首个广告位)取 12 航班、高德评价 `[class*="ReviewList_reviewItem__"]` 取 30 条零截图、携程点评 `[class*="reviewSwiper_reviewSwiper-item"]` 选择器命中;CSS-modules 哈希类名一律用前缀包含匹配。方法 + 探测脚本 + 各站点模板沉淀进 references,SKILL.md/playbook 加了默认走 JS 抓取的指引。

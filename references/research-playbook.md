@@ -92,7 +92,10 @@ Trains are exempt: a 12306/web_search fare is the source of truth.
 **Tips & avoid-traps:**
 - `"<目的地> 避雷 坑 攻略"` · `"<destination> tourist traps avoid"` (corroborate before repeating —
   one ranty post isn't proof; look for repeated, specific complaints).
-- **小红书攻略（很有用，但要鉴别软广）。** 搜 `"<目的地> 攻略 小红书"` / `"<目的地> <主题> 避雷"`，
+- **小红书攻略（很有用，但要鉴别软广）。** 两条路：`web_search "<目的地> 攻略 小红书"`，或（浏览器已连时
+  更佳）直接抓小红书搜索页 `.note-item` 列表读标题/作者/点赞——**搜索列表那层通常就够佐证**（多篇互证 +
+  看点赞量判热度 + 标题鉴别软广），模板与五条反爬约束见 `references/scraping-method.md` §六点五（要点：
+  必须登录态、别抽 xsec_token URL 而是点击进浮层、别高频防滑块）。搜 `"<目的地> 攻略"` / `"<目的地> <主题> 避雷"`，
   小红书的本地玩法、出片机位、排队避坑、亲子/银发实操常比官网鲜活。**但要会分辨软广/探店推广**：
   通篇只夸不提缺点、出现「合作/赞助/探店/团购券/到店报暗号」、统一话术配统一滤镜图、引导私信下单的，
   当广告打折看；**只采被多篇独立笔记重复印证的具体经验**（如"X点后不用排队""Y门进人少"），

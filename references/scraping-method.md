@@ -249,6 +249,65 @@ Array.from(document.querySelectorAll('[class*="ReviewList_reviewItem__"]')).map(
 
 ---
 
+## 六点五、小红书（旅游攻略）——同方法可用，但反爬最重
+
+同一套「JS 读 DOM」对小红书一样有效，但约束最多。**本 skill 用它做攻略佐证**：搜 `<目的地> 攻略`，抓
+搜索列表的标题/作者/点赞，**跨多篇独立笔记互证**经验、并按软广规则过滤（见 SKILL.md Step 3）。
+
+> **复验记录（2026-06-13）：** ✅ 搜索列表 `.note-item` 实测可用——`大理攻略` 取到 **20–22 条**带
+> 标题/作者/点赞/图文或视频，已登录、无验证码。⚠️ **xsec_token 的 href 抓不出来**：harness 隐私防护
+> 会把含 token 的 query string 拦成 `[BLOCKED: Cookie/query string data]`。所以**别去抽 token URL 再
+> 导航**——要看某篇正文/评论，直接**点击该 `.note-item`** 打开浮层（token 在点击里走、不经过你），
+> 再按下面浮层模板抓。笔记正文 + 评论沿用用户实测。
+
+**搜索结果列表**（稳定类名，直接抓）
+- 容器：`.note-item`（约 20–22 个/页）
+- 字段：标题 `[class*="title"]`、作者 `[class*="author"] [class*="name"]`、点赞 `[class*="count"]`、
+  是否视频 `[class*="play"]`
+
+```javascript
+Array.from(document.querySelectorAll('.note-item')).map(it => ({
+  title:  it.querySelector('[class*="title"]')?.textContent.trim(),
+  author: it.querySelector('.author .name, [class*="author"] [class*="name"], .name')?.textContent.trim(),
+  likes:  it.querySelector('[class*="count"]')?.textContent.trim(),
+  type:   it.querySelector('[class*="play"]') ? '视频' : '图文'
+})).filter(d => d.title);
+// 要读某篇 → 点击对应 .note-item 打开浮层（不要抽 xsec_token URL，会被隐私防护拦）
+```
+
+**单篇笔记正文 + 评论**（点开浮层后抓）
+- **必须 scope 到浮层容器** `.note-detail-mask` / `[class*="note-detail"]`，否则会窜到背景搜索卡片
+- 字段：`#detail-title` / `#detail-desc`（含 `#标签`）/ `.comment-item`
+
+```javascript
+const root = document.querySelector('.note-detail-mask, [class*="note-detail"]') || document;
+const t = sel => root.querySelector(sel)?.textContent.trim().replace(/\s+/g,' ') || null;
+const note = {
+  title: t('#detail-title'),
+  desc:  t('#detail-desc'),
+  tags:  Array.from(root.querySelectorAll('#detail-desc a')).map(e=>e.textContent.trim()).filter(x=>x.startsWith('#'))
+};
+const comments = Array.from(root.querySelectorAll('.comment-item')).map(c => ({
+  user: c.querySelector('[class*="name"]')?.textContent.trim(),
+  text: c.querySelector('[class*="content"]')?.textContent.trim().replace(/\s+/g,' '),
+  time: c.querySelector('[class*="date"]')?.textContent.trim()
+})).filter(c => c.text);
+```
+
+**小红书五条硬约束**
+1. **必须登录态**：用用户已登录的 Chrome 会话，否则撞登录墙。
+2. **xsec_token 是命门、但抓不出**：裸 `.../explore/<id>` 直接导航会被拦成「当前笔记暂时无法浏览」
+   （error_code=300031）；而含 token 的 href 又被 harness 隐私防护 BLOCK。**结论：点击 `.note-item` 进，
+   别抽 token URL。**
+3. **浮层串数据**：笔记以浮层打开时背景列表仍在 DOM → **必须 scope 到浮层容器**。
+4. **别高频操作**：连续快速点击/翻页易触发滑块验证码；验证码无法自动通过 → 放慢、小批量分次跑。
+5. **视频笔记**正文在视频里，文字仅能拿 desc/标签/评论；图文笔记可拿完整正文。
+
+> 对本 skill，**搜索列表那一层(标题+点赞+作者)通常就够了**——多篇互证 + 看点赞量判断热度 + 标题里
+> 鉴别软广，已能支撑攻略佐证；只有特别想要某篇细节时才点进浮层（控制频率防滑块）。
+
+---
+
 ## 七、本次实测结果速览
 
 | 场景 | URL 类型 | 容器选择器 | 类名类型 | 加载方式 | 实测条数 |
@@ -257,6 +316,8 @@ Array.from(document.querySelectorAll('[class*="ReviewList_reviewItem__"]')).map(
 | 飞猪机票 | sjipiao.fliggy.com | `tr.flight-item-tr` | 普通稳定 | 一次性全渲染 | 111 |
 | 携程酒店点评 | hotels.ctrip.com | `[class*="reviewSwiper-item"]` | CSS-modules 哈希 | 滚动加载 | 预览若干（全部需展开弹层） |
 | 高德 POI 评价 | amap.com | `[class*="ReviewList_reviewItem__"]` | CSS-modules 哈希 | 面板内 | 16 |
+| 小红书搜索 | xiaohongshu.com | `.note-item` | 普通稳定 | 一页 | 20–22 |
+| 小红书笔记正文 | xiaohongshu.com | `#detail-title`/`.comment-item` | id + 普通 | 浮层（点击进入） | 正文+评论 |
 
 ---
 
