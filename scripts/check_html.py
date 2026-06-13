@@ -29,7 +29,10 @@ Checks (each FAIL must be fixed before presenting the file):
   9. Price-compare honesty      a .cheapest ✓最低 row that is itself an
                                estimate, or a dead platform (去哪儿/美团/…)
                                used as a price source = fake comparison.
-  10. Weather not fabricated    the same specific per-day temperature
+  10. Hotel price 2nd source   a priced hotel card must engage 飞猪 (or
+                               Booking/Agoda) — 携程-only is single-source;
+                               高德 is reviews-only and doesn't count.
+  11. Weather not fabricated    the same specific per-day temperature
                                repeated across day cards (a forecast you
                                cannot have for dates >14 days out).
 
@@ -235,6 +238,32 @@ def check_fake_cheapest(html):
     return problems
 
 
+def check_hotel_price_second_source(html):
+    """Each hotel card that quotes a price must engage a SECOND price platform
+    (飞猪 domestic, or Booking/Agoda international) — either a real price or an
+    honest note (验证码墙/未读). 携程-only hotel pricing = single-source. 高德 is a
+    REVIEW source (no room prices) and does NOT satisfy this. 成都-safe: all three
+    成都 cards mention 飞猪 (two as a price, 如家 as a captcha-wall note)."""
+    problems = []
+    # 飞猪 must be ENGAGED: followed (within ~35 chars, tags stripped) by a real ¥
+    # price OR a genuine-unavailability marker. A bare 飞猪-defer ("订前再比价 / 我未核")
+    # does NOT count — that is exactly the lazy single-source skip this catches.
+    engaged = re.compile(r'(飞猪|Booking|Agoda|缤客)[^¥]{0,35}?'
+                         r'(¥|验证码|登录|拦截|滑块|人机|墙|未读|连不上|超时|售罄|无可比|查无)', re.I)
+    for i, c in enumerate(_hotel_cards(html), 1):
+        pc = c[c.find('price-compare'):] if 'price-compare' in c else ""
+        if "¥" not in pc:
+            continue  # no priced hotel row → nothing to cross-source
+        text = re.sub(r'<[^>]+>', '', c)  # strip tags so the window is reliable
+        if not engaged.search(text):
+            nm = re.search(r'class="h-name">([^<]*)', c)
+            label = nm.group(1) if nm else f"#{i}"
+            problems.append(f"hotel '{label}': 携程-only price — 飞猪 is missing or only deferred to the "
+                            f"user (\"订前再比价\"), not actually engaged. Query 飞猪 for a real ¥, or note a "
+                            f"genuine wall (验证码/未读); 高德 has no room prices and doesn't count.")
+    return problems
+
+
 def check_duplicate_forecast(html):
     """The same specific slash-format temperature string repeated across day cards,
     with no 气候典型/非当日预报 qualifier, is a fabricated per-day forecast (you cannot
@@ -281,6 +310,7 @@ def run(path):
         ("mobile adaptation (viewport + media query)", check_mobile(html)),
         ("hotel review provenance (no fabricated ratings/verdicts)", check_review_provenance(html)),
         ("price comparison honesty (no fake 最低 / dead platforms)", check_fake_cheapest(html)),
+        ("hotel price second source (飞猪, not just 携程)", check_hotel_price_second_source(html)),
         ("weather not fabricated (no repeated per-day forecast)", check_duplicate_forecast(html)),
     ]:
         if probs:

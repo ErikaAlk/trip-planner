@@ -309,7 +309,12 @@ compare prices across platforms; read the actual review section; never book.**
 
   → 一张合格的酒店卡 = **携程（价+评）+ 飞猪（价）+ 高德（评）三次浏览器读**。查了携程+高德 ≠ 完成，飞猪价格
   仍要查；只有飞猪真的连不上/验证码墙/未读到，才在那一行如实标「飞猪 · 验证码墙未读」并退到 web_search 估价
-  （标「估」），**绝不是默认不查飞猪**。
+  （标「估」），**绝不是默认不查飞猪**。`check_html.py` 会 FAIL 任何「飞猪只写了"订前自己比"却没真查」的酒店卡。
+  - **一个源失败，绝不连累另一个（真实翻车点）。** 一次运行里高德评论没加载出来，agent 就写「高德/飞猪我没
+    核到」——把价格源飞猪和评论源高德捆在一起一起放弃了。**高德（评论源）失败，与飞猪（价格源）该不该查，
+    毫无关系**；反之亦然。一个挂了就单独如实标它挂了，另一个照查。
+  - **高德评论是懒加载——别太早下"没评价"的结论。** 点开 POI 后 wait 3–5s、必要时在详情面板内下滚一下再读；
+    搜索若默认跳了北京＝没解析到城市，把城市名加进 query 重搜+点搜索按钮。「高德没返回评价」十有八九是没等够。
 - **别默认「集团 App 会员价更低」**——实测未必，且华住会官网查不到价；会员价只有真读到才写。**Use the same
   defer-and-batch login handling and the query-only prohibitions from Step 2** (never log in / solve
   captchas yourself, never book). Trains/flights/hotels all share that flow.

@@ -53,7 +53,7 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    | 飞猪机票（单程列表） | `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity={dep3字码}&arrCity={arr3字码}&depDate=YYYY-MM-DD&depCityName={中文}&arrCityName={中文}` | 缺 depDate/三字码报「入参校验失败」（≠已废） |
    | 飞猪酒店（关键词+日期） | `https://hotel.fliggy.com/hotel_list3.htm?cityName={中文城市}&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords={酒店名}` | 连续查可能触发验证码墙 |
    | 吉祥官网（航班查询） | `https://www.juneyaoair.com/flightQuery?depCity={中文}-{3字码}&arrCity={中文}-{3字码}&depDate=YYYY-MM-DD&routeType=OW` | 其余航司官网结构各异，首次 UI 搜索后**记下结果页 URL 进表** |
-   | 高德 POI 搜索（看评价/坐标） | `https://www.amap.com/search?query={城市名}{POI名}` | **城市塞进 query，别用 `&city=中文`（不过滤）**；**导航后 URL 不自动执行，必须点搜索按钮(放大镜)才出结果**，之后它自动把 city 解析成 adcode（如厦门350200）。点结果 → POI 详情页有真实带日期的「评价」 |
+   | 高德 POI 搜索（看评价/坐标） | `https://www.amap.com/search?query={城市名}{POI名}` | **城市塞进 query，别用 `&city=中文`（不过滤）**；**导航后 URL 不自动执行，必须点搜索按钮(放大镜)才出结果**，之后它自动把 city 解析成 adcode（如厦门350200）。**点 POI 后评价区是懒加载——必须 wait 3–5s 再读，常需在详情面板内向下滚一下；「没返回评价」十有八九是没等够，不是真没有（实测三亚喜来登有 1.5万 评价）。若搜索默认跳了北京 = 没解析到城市，把城市名加进 query 重搜+点按钮。** |
    | 高德路线（起终点要 UI 选点） | 搜起点 POI → 点「路线」→ 改终点 → 切驾车/公交 | 结果含驾车里程/时长/过路费、公交方案+票价；无打车价，用里程×当地计价标准折算并注明来源 |
 
    **碰壁即记录（用户硬性要求）：** 任何一次"直接 navigate 没出结果、得手动点击/改参数才成"的情况，
@@ -92,6 +92,11 @@ Trains are exempt: a 12306/web_search fare is the source of truth.
 **Tips & avoid-traps:**
 - `"<目的地> 避雷 坑 攻略"` · `"<destination> tourist traps avoid"` (corroborate before repeating —
   one ranty post isn't proof; look for repeated, specific complaints).
+- **小红书攻略（很有用，但要鉴别软广）。** 搜 `"<目的地> 攻略 小红书"` / `"<目的地> <主题> 避雷"`，
+  小红书的本地玩法、出片机位、排队避坑、亲子/银发实操常比官网鲜活。**但要会分辨软广/探店推广**：
+  通篇只夸不提缺点、出现「合作/赞助/探店/团购券/到店报暗号」、统一话术配统一滤镜图、引导私信下单的，
+  当广告打折看；**只采被多篇独立笔记重复印证的具体经验**（如"X点后不用排队""Y门进人少"），
+  单篇热帖不作准，硬事实（票价/时间）仍以官网为准。
 
 Capture for each place: name, address/area, **opening hours + closing day**, ticket price, why-go,
 one practical tip, and `lat`/`lng`. If a field is unverifiable, record it as such and surface that in
