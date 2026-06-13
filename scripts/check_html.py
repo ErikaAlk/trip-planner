@@ -22,6 +22,21 @@ Checks (each FAIL must be fixed before presenting the file):
   7. Mobile adaptation         a viewport meta tag AND a max-width media
                                query block (phones must not get the raw
                                desktop layout).
+  8. Review provenance         a hotel card asserting a rating / 点评数 /
+                               review verdict must carry a dated browse
+                               provenance marker (实查于 YYYY-MM-DD) — catches
+                               fabricated "4.8 · 3,201 条（已核）" cards.
+  9. Price-compare honesty      a .cheapest ✓最低 row that is itself an
+                               estimate, or a dead platform (去哪儿/美团/…)
+                               used as a price source = fake comparison.
+  10. Weather not fabricated    the same specific per-day temperature
+                               repeated across day cards (a forecast you
+                               cannot have for dates >14 days out).
+
+  NOTE: checks 8–10 are structural BACKSTOPS for the most common fabrication
+  patterns, not a fabrication detector — a determined agent can still evade a
+  regex. The load-bearing rule is the 数据诚信契约 in SKILL.md (verify-this-
+  session or hedge-without-invented-specifics; 宁可不写, 绝不编).
 
 Exit code: 0 = clean, 1 = one or more FAILs.  Pure standard library.
 """
@@ -165,6 +180,78 @@ def check_self_contained(html):
     return problems
 
 
+# ── Fabrication backstops (structural; a determined fabricator can still evade —
+#    the load-bearing fix is the 数据诚信契约 in SKILL.md; these catch the lazy
+#    default path that fills rating/verdict fields without ever browsing). ──
+
+def _hotel_cards(html):
+    """Best-effort split into per-.hotel-card chunks (card start → next card start)."""
+    starts = [m.start() for m in re.finditer(r'<div\s+class="hotel"', html)]
+    if not starts:
+        return []
+    bounds = starts + [len(html)]
+    return [html[bounds[i]:bounds[i + 1]] for i in range(len(starts))]
+
+
+def check_review_provenance(html):
+    """Inverted, NOT confession-gated: a hotel card that ASSERTS a rating, a
+    review count, or a review-area verdict must carry a date-anchored browse
+    provenance marker in the SAME card. Omitting the honesty token no longer
+    disables detection — a no-browser card must simply not assert these."""
+    problems = []
+    # a numeric star rating in the .h-rating <b>, e.g. <b>4.8</b> / <b>约4.6</b>
+    rating = re.compile(r'class="h-rating">[^<]*<b>\s*约?\s*[1-5]\.\d', re.I)
+    count = re.compile(r'\d[\d,]+\s*条点评')
+    verdict = re.compile(r'已核|可信|实测|分布正常|不像刷分|好评(具体|集中)|口碑稳|水军')
+    # provenance must be date-anchored so a bare decoy word won't satisfy it
+    prov = re.compile(r'实查于\s*\d{4}-\d{2}-\d{2}|浏览器实读[^。]{0,30}\d{4}-\d{2}-\d{2}'
+                      r'|浏览器实查[^。]{0,30}\d{4}-\d{2}-\d{2}')
+    for i, c in enumerate(_hotel_cards(html), 1):
+        nm = re.search(r'class="h-name">([^<]*)', c)
+        label = nm.group(1) if nm else f"#{i}"
+        signal = rating.search(c) or count.search(c) or verdict.search(c)
+        if signal and not prov.search(c):
+            problems.append(f"hotel '{label}': asserts a rating/点评数/评论结论 but the card has no "
+                            f"dated browse-provenance (实查于 YYYY-MM-DD / 浏览器实读…日期) — "
+                            f"either browser-read it for real, or drop the number/verdict "
+                            f"(写「评分以 App 为准」)")
+    return problems
+
+
+def check_fake_cheapest(html):
+    """A price row tagged .cheapest (✓最低) that is itself an estimate (（估）/估价),
+    or any defunct platform used as a hotel price row, is a fabricated comparison."""
+    problems = []
+    for m in re.finditer(r'class="pc-row[^"]*cheapest[^"]*"[^>]*>(.*?)</div>\s*(?=<div|</div)', html, re.S):
+        if re.search(r'（估）|估价|≈|约¥', m.group(1)):
+            problems.append("a .cheapest (最低) row is itself an estimate (（估）/约¥) — "
+                            "you cannot crown a 最低 without real compared prices (fake comparison)")
+            break
+    for m in re.finditer(r'class="pc-plat">([^<]*)', html):
+        if re.search(r'美团|去哪儿|同程|艺龙', m.group(1)):
+            problems.append(f"defunct platform in a price row (.pc-plat: {m.group(1).strip()[:20]}) — "
+                            f"去哪儿/美团/同程/艺龙 are dead (see platform truth table); never a price source")
+            break
+    return problems
+
+
+def check_duplicate_forecast(html):
+    """The same specific slash-format temperature string repeated across day cards,
+    with no 气候典型/非当日预报 qualifier, is a fabricated per-day forecast (you cannot
+    know a specific daily temp for dates outside the ~14-day window)."""
+    problems = []
+    temps = re.findall(r'约?\s*\d{2}\s*°\s*/\s*\d{2}\s*°', html)
+    for t in set(temps):
+        if temps.count(t) >= 2:
+            # exempt only if every occurrence is qualified as climatology
+            occ = [m.start() for m in re.finditer(re.escape(t), html)]
+            if not all(re.search(r'气候典型|非当日预报|典型', html[max(0, p - 4):p + 40]) for p in occ):
+                problems.append(f"temperature '{t.strip()}' repeated on {temps.count(t)} day-cards with no "
+                                f"「气候典型/非当日预报」 qualifier — looks like a fabricated forecast, "
+                                f"not per-day data (use a range or label it climatology)")
+    return problems
+
+
 def run(path):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -192,6 +279,9 @@ def run(path):
         ("self-contained", check_self_contained(html)),
         ("travel components (hotel/budget/checklist)", check_travel_components(html)),
         ("mobile adaptation (viewport + media query)", check_mobile(html)),
+        ("hotel review provenance (no fabricated ratings/verdicts)", check_review_provenance(html)),
+        ("price comparison honesty (no fake 最低 / dead platforms)", check_fake_cheapest(html)),
+        ("weather not fabricated (no repeated per-day forecast)", check_duplicate_forecast(html)),
     ]:
         if probs:
             fails += 1
@@ -212,6 +302,13 @@ def run(path):
 
 
 def main():
+    # The output mixes Chinese + symbols; force UTF-8 so a GBK Windows console
+    # doesn't crash on chars like ° or — mid-report.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except (AttributeError, ValueError):
+            pass
     if len(sys.argv) != 2:
         sys.exit("usage: python3 check_html.py <output>.html")
     sys.exit(0 if run(sys.argv[1]) else 1)

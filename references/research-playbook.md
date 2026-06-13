@@ -226,7 +226,18 @@ place you couldn't locate; round to district level and say the pin is approximat
 
 ## 7. Honesty & safety recap
 
+The governing rule is the **数据诚信契约 in SKILL.md** — read it; it overrides everything else. Recap:
+
+- **每个具体数字/事实：本会话实查到（带来源标记）或不写成具体值（hedge，无杜撰细节）。宁可不写，绝不编。**
+  这条管所有面，不只是酒店：票价/营业时间/地址/车次/时刻/船票/打车费/里程/步数/预约配额/坐标/天气。
+- **受控『已验证』词**（已核/可信/实测/实测数据/分布正常/不像刷分/好评集中…及其同义词）只有真查到、且
+  就近带来源+日期才能用；同一卡价格标了「未核实/估价」就不得出现这些词（自相矛盾 = 伪造已核实）。
+- **没浏览器读到评论区时**：`.h-rating` 留空或「评分以 App 为准」（禁止任何分数/条数），`.review-check`
+  只写连锁常识推荐理由（禁止任何评论区结论）。这与"价格回退标估价"是平行的铁律。
+- **比价**：已废平台（去哪儿/美团/同程/艺龙，见平台真值表）禁止作价格行；估价行不得打「✓最低」。
+- **打车/里程/时长**只能来自高德路线规划并标「（高德实测）」，否则写「以高德为准」。
 - Query-only for tickets; never log in, never solve CAPTCHAs, never pay.
-- Every hours/price/address/schedule is sourced or marked unverified — no invented facts.
 - The plan is advisory: end the HTML with a reminder to re-confirm hours and prices before going, and
   to book anything marked `must` early.
+- `scripts/check_html.py` checks 8–10 backstop the most common fabrications (no-provenance hotel
+  ratings/verdicts, fake 最低, repeated fake forecasts) — a backstop, not a substitute for the contract.

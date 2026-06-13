@@ -25,6 +25,52 @@ names). Filename: `<目的地><N>日游行程.html` (e.g. `东京5日游行程.h
 
 ---
 
+## 数据诚信契约（DATA INTEGRITY — 凌驾本文件一切其它规则）
+
+**这个 skill 唯一不能破的底线：页面上每一个具体数字/事实，要么本会话真的查到了，要么就别写成具体值。
+宁可不写，绝不编。** 一次编造的营业时间能把游客送到闭馆的门口，一张编造的"4.8 分 3,201 条点评（已核）"
+能让整份行程的可信度归零。这条契约的违反，比任何排版/组件缺失都严重。
+
+**两类来源，泾渭分明：**
+
+- **实查（可写具体值）**：本会话真的用浏览器（携程/飞猪/航司官网/高德）或 `web_search` 读到了，
+  且**就近标了来源**——浏览器读的标「实查于 YYYY-MM-DD」/「浏览器实读点评区」/「高德实测」，
+  web_search 读的标「web_search · 未浏览器核实」，火车标「以 12306 为准」。
+- **没查到（禁止写具体值）**：没读到就**不许填一个看起来合理的数**。用不含杜撰细节的 hedge 占位，
+  例如「营业时间以官网为准」「评分以 App 为准」「打车费用以高德为准」「车次时刻以 12306 实时为准」。
+
+**受控『已验证』词表——只有真查到才能用：**
+`已核 / 已核实 / 可信 / 实测 / 实测数据 / 浏览器实读 / 浏览器实查 / 高德实测 / 分布正常 / 不像刷分 /
+好评集中在X / 口碑稳 / 活跃真实`。这些词**只有当本会话确实读到对应内容、且同一处带了来源+日期标记**时
+才允许出现。**同一张卡/同一段里，价格标了「未核实/估价」，就绝不能在别处出现这些词**——那是自相矛盾，
+是最恶劣的"伪装成已核实"。也不要用同义词（口碑扎实/水分不大/可放心订/评分稳）绕开——**任何关于评论区
+的结论性判断，没有就近来源标记，一律不写。**
+
+**按面分项的硬规矩（每一面都管，不只是酒店）：**
+
+| 数据 | 实查到 → 可写 | 没查到 → 只能写 |
+|---|---|---|
+| 酒店评分/点评数 | 具体分+条数+「实查于 日期」 | 留空，或「评分以 App 为准」（**禁止**任何分数/条数） |
+| 评论体检结论 | 读到的真实复发主题+来源标记 | 只写"为什么选它/订前自查"这类连锁常识推荐理由 |
+| 酒店/机票比价 | 现役平台（携程/飞猪/官网）真实价 | 现役平台估价并标「（估）」；**已废平台（去哪儿/美团/同程/艺龙）禁止出现**；估价行不得打「✓最低」 |
+| 门票¥/营业时间/地址 | 实查值 | 就近标「以官网为准」（**禁止**编逐项联票价并做"单买超¥X"的派生算术） |
+| 车次号/分钟级时刻/票价 | 实查值+「以12306为准」 | 不写具体车次号与到发分钟，只写「高铁直达约 Nh · 班次票价以12306实时为准」 |
+| 预约配额/放号时刻 | 实查值 | 「名额有限 · 配额与放号以官方公众号当日为准」（**禁止**编"每日2000人/8:00放号"） |
+| 打车¥/分钟/里程 | 高德路线规划值+「（高德实测）」 | 「打车可达 · 费用时长以高德为准」（短步行腿 ≤2km 可按 70–80 m/min 估距离+步行 min，但一旦出现¥或"打车"就必须高德来源；**禁止**"步行或打车 N min"这种混写偷渡打车分钟） |
+| 步数 | 由实测里程换算（≈1,300 步/km） | 不标具体步数 |
+| 天气（>14 天外） | —— | 「X月气候典型 约A°/B°（非当日预报，出行前再查）」，**不得对多日复制同一具体温度串当各日预报** |
+| 地图坐标 | 知名点的已知坐标 | 定位不到就降到城区级并注明近似，**禁止**给定位不到的点编 4 位小数精确坐标 |
+| 预算派生 | 各项来自上面的实查/估价 | 不得把编造的单价滚成"精确"日小计/总计；header 总价与预算表必须一致 |
+
+**逃生门（"你直接安排就行"）只放宽提问，不放宽这条契约**：缺的偏好按推荐值填、写进顶部假设 callout；
+但任何**事实**仍然遵守上表——没查到就 hedge，绝不因为是非交互模式就开始编数字。
+
+`scripts/check_html.py` 的第 8–10 检查是这条契约的**兜底**（抓最常见的编造：无凭据的酒店评分/评论结论、
+假"最低"比价、复制粘贴的假天气）。但校验器只是结构兜底、挡不住刻意绕过——**真正的防线是你自己守住"宁可
+不写绝不编"**。
+
+---
+
 ## Run it as a workflow (plan → research → verify → assemble)
 
 Don't free-write a plan in one pass. The quality comes from the structure:
@@ -34,10 +80,11 @@ Don't free-write a plan in one pass. The quality comes from the structure:
 2. **Research (fan-out)** — for each day/cluster, look up transport, weather, opening hours, closure
    days, and prices with `web_search` (Steps 2–3). For a big trip you may run parallel subagents, one
    per day or per city.
-3. **Verify (the decisive step)** — **never fabricate** hours, prices, addresses, or train/flight
-   times. Anything you state as fact must come from a search result; if you couldn't verify it, say so
-   in the HTML ("营业时间以官网为准") rather than inventing a number. Re-check that no stop is scheduled
-   on its closing day and that intercity connections leave realistic buffers.
+3. **Verify (the decisive step)** — enforce the **数据诚信契约 above**: every specific number/fact is
+   either actually verified this session (with a source marker) or written as a hedge that carries **no
+   invented specifics** — never a plausible-looking number. This applies to **every surface**, not just
+   hotels: 票价/营业时间/地址/车次/时刻/船票/打车费/里程/步数/预约配额/坐标/天气. Re-check that no stop
+   is scheduled on its closing day and that intercity connections leave realistic buffers.
 4. **Assemble** — build the HTML per `references/design-system.md`, then run the checker
    (`scripts/check_html.py`).
 
