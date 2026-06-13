@@ -46,18 +46,19 @@ are stale/indicative; for every air leg you must read **live** fares in a browse
    查不到就标「票面价 · 燃油/机建另计，以出票页为准」，**绝不能自己编一个税费数**。
 
    **URL 模板库（实测可用 · 直接套用，省点击省 token；坏了就更新这里）：**
-   | 平台/用途 | 模板 |
-   |---|---|
-   | 携程机票（单程列表） | `https://flights.ctrip.com/online/list/oneway-{dep3字码}-{arr3字码}?depdate=YYYY-MM-DD&cabin=y_s` |
-   | 携程酒店（城市列表+日期） | `https://hotels.ctrip.com/hotels/list?city={城市id，成都=28}&checkin=YYYY/MM/DD&checkout=YYYY/MM/DD`（关键词用页内搜索框输入，URL 传参不生效） |
-   | 飞猪机票（单程列表） | `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity={dep3字码}&arrCity={arr3字码}&depDate=YYYY-MM-DD&depCityName={中文}&arrCityName={中文}` |
-   | 飞猪酒店（关键词+日期） | `https://hotel.fliggy.com/hotel_list3.htm?cityName={中文城市}&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords={酒店名}` |
-   | 吉祥官网（航班查询） | `https://www.juneyaoair.com/flightQuery?depCity={中文}-{3字码}&arrCity={中文}-{3字码}&depDate=YYYY-MM-DD&routeType=OW`（其余航司官网查询页结构各异，首次用 UI 搜索后**记下结果页 URL 存进这张表**） |
-   | 高德 POI 搜索（看评价/坐标） | `https://www.amap.com/search?query={关键词}&city={中文城市}` |
-   | 高德路线（起终点要 UI 选点） | 搜 POI → 点「路线」→ 改起点；结果含驾车里程/时长/过路费与公交方案+票价（无打车价，用里程×当地计价标准折算并注明来源） |
+   | 平台/用途 | 模板 | 实测注意（碰过的壁） |
+   |---|---|---|
+   | 携程机票（单程列表） | `https://flights.ctrip.com/online/list/oneway-{dep3字码}-{arr3字码}?depdate=YYYY-MM-DD&cabin=y_s` | 免登录可读 |
+   | 携程酒店（城市列表+日期） | `https://hotels.ctrip.com/hotels/list?city={城市数字id}&checkin=YYYY/MM/DD&checkout=YYYY/MM/DD` | **city id 用错会静默返回「找到0家」**（曾把厦门错填 18→0 家）。常见 id：北京1·上海2·厦门25·成都28·杭州17·广州32·深圳30·西安10；**不确定就先在框里输城市名让它解析**。**keyword 参数不过滤**——酒店名一律在页内搜索框输入 |
+   | 飞猪机票（单程列表） | `https://sjipiao.fliggy.com/flight_search_result.htm?tripType=0&depCity={dep3字码}&arrCity={arr3字码}&depDate=YYYY-MM-DD&depCityName={中文}&arrCityName={中文}` | 缺 depDate/三字码报「入参校验失败」（≠已废） |
+   | 飞猪酒店（关键词+日期） | `https://hotel.fliggy.com/hotel_list3.htm?cityName={中文城市}&checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD&keywords={酒店名}` | 连续查可能触发验证码墙 |
+   | 吉祥官网（航班查询） | `https://www.juneyaoair.com/flightQuery?depCity={中文}-{3字码}&arrCity={中文}-{3字码}&depDate=YYYY-MM-DD&routeType=OW` | 其余航司官网结构各异，首次 UI 搜索后**记下结果页 URL 进表** |
+   | 高德 POI 搜索（看评价/坐标） | `https://www.amap.com/search?query={城市名}{POI名}` | **城市塞进 query，别用 `&city=中文`（不过滤）**；**导航后 URL 不自动执行，必须点搜索按钮(放大镜)才出结果**，之后它自动把 city 解析成 adcode（如厦门350200）。点结果 → POI 详情页有真实带日期的「评价」 |
+   | 高德路线（起终点要 UI 选点） | 搜起点 POI → 点「路线」→ 改终点 → 切驾车/公交 | 结果含驾车里程/时长/过路费、公交方案+票价；无打车价，用里程×当地计价标准折算并注明来源 |
 
-   通用纪律：**每在一个新平台手动点出一次有效结果页，就回头看它的 URL——有规律就提炼成模板补进上表**，
-   下次直接 navigate，不再重复点击流程。
+   **碰壁即记录（用户硬性要求）：** 任何一次"直接 navigate 没出结果、得手动点击/改参数才成"的情况，
+   **当场把真正可用的 URL 格式或操作序列回填到上表的「实测注意」列**——目标是让"直接输 URL 就能用"的状态
+   尽量保持。下次同平台直接套，不再重复踩同一个坑、不再重复点击流程（省 token）。
 3. Record each `platform → price` **with the exact query time**, put them in `.price-compare` (cheapest
    tagged `class="cheapest"`), and set `.tr-price` to "最低 ¥X".
 
@@ -121,9 +122,15 @@ Selecting one is the same discipline as flights — **research, don't trust the 
 platforms; never book.**
 
 **Read the review section, not the marketing blurb (the decisive step).** A polished listing and a high
-headline number prove nothing. Open the actual reviews on 携程 / **高德地图**（POI 评价真实度高，可靠信源）/
-大众点评 / 小红书 / Google / Booking and **sort to recent + lowest** so you read fresh and negative ones, then judge whether the
-review area looks **normal**:
+headline number prove nothing.
+
+**评论必须双信源——携程 + 高德地图，缺一不可（用户硬性要求）。** 单一平台的评论不够可信：携程好评常偏
+光鲜、商家运营痕迹重；高德的 POI 评价更接近真实住客口碑。流程：携程筛「4.7 分以上」找候选连锁 → 逐个读
+携程评论区 → **同一家再去高德读一遍评论**（URL 模板见上：`amap.com/search?query={城市}{酒店名}` → 点搜索
+按钮 → 点 POI → 「评价」，真实带日期）→ **交叉比对**：两边一致才放心；**携程光鲜但高德出现复发吐槽
+（旧/吵/窗户/卫生），信高德的警告**。`.review-check` 里写清"两边都读了、各自说了什么"。其它信源（大众
+点评 / 小红书 / Google / Booking）可加，但携程+高德是底线。**sort to recent + lowest** so you read fresh
+and negative ones, then judge whether the review area looks **normal**:
 
 | Signal | Healthy (pick) | Suspicious (avoid / warn) |
 |---|---|---|
@@ -131,7 +138,7 @@ review area looks **normal**:
 | Score shape | believable mix, mostly good | **100% 5★**, or score clashes with the written complaints |
 | Specificity | concrete (隔音/早餐/前台/床/水压) | generic, dateless, copy-paste praise (水军 tell) |
 | Negatives | minor/manageable | **recurring serious**: 卫生差/有虫/隔音/不安全/偷换房型/强制消费 |
-| Cross-platform | consistent across sites | one glows, others warn → **trust the warnings** |
+| Cross-platform (携程↔高德) | both agree | 携程 glows but 高德 surfaces recurring complaints → **trust 高德's warnings** |
 
 If the same serious complaint repeats across recent reviews, **drop the hotel** no matter how nice the
 photos are.
@@ -165,9 +172,12 @@ Honest time accounting is what makes a plan usable. Rough stay durations (adjust
 | 正餐 | 60–90 min；排队店 +30–45 min |
 | 咖啡 / 小吃歇脚 | 30 min |
 
-Add **point-to-point transit** between stops — **taxi cost/time and driving distance come from 高德
-路线规划, not from your head**; metro hops are often 20–40 min door-to-door once you count walking +
-waiting — **plus a 15–20 min buffer** per transition.
+Add **point-to-point transit** between stops. **跨片区/打车腿的里程·时长·过路费必须真的去高德路线规划
+跑一遍**（浏览器已连时这是强制动作，不是写个「以高德为准」就算完——那是连不上浏览器时的退路）。
+真实翻车点：一次浏览器已连的运行里，agent 把所有路线都只标了「以高德为准」却没去高德实跑，等于放弃了
+本可拿到的真实里程/时长。流程：高德搜起点 POI → 点「路线」→ 改终点 → 读驾车里程/时长/过路费（打车价用
+里程×当地出租计价标准折算并注明来源），并在 `.transit`/step 标「（高德实测）」。metro hops are often
+20–40 min door-to-door once you count walking + waiting — **plus a 15–20 min buffer** per transition.
 A day that looks full on paper with zero buffer will run 1–2 hours late by afternoon — pad it.
 
 **Commute annotation + steps.** Record each inter-stop hop as **mode + distance + time** and put it in

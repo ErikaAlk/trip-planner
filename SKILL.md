@@ -227,6 +227,9 @@ This is what separates a real plan from a list of famous places. Apply all of it
   time, e.g. `🚶 600 m · 步行 8 min` or `🚇 3 站 · 12 min`) as a **transit connector**, and it must match
   the day's route on the map. Sum each day's walking into a **步数估算** (≈ 1,300 步/km) shown in the
   day's overview line. Keep walking legs short for 银发/亲子 and call it out.
+  **跨片区/打车腿的里程·时长·过路费必须真的去高德路线规划跑一遍**（浏览器已连时这是强制动作，标「（高德
+  实测）」；不是写个「以高德为准」就算完——那只是连不上浏览器时的退路）。纯步行短腿（≤2km）可按 70–80
+  m/min 估，但出现打车¥或分钟就必须有高德来源。
 - **餐饮卡位**: place 午餐 / 晚餐 at a spot that's **on the route** at the right time, near the stop
   you'll be at — not a detour across town.
 - **硬约束**:
@@ -286,8 +289,10 @@ compare prices across platforms; read the actual review section; never book.**
     前台态度 / 与图片不符. If the same serious complaint repeats across recent reviews → drop it.
   - **Fake-review tells:** a burst of identical, generic, dateless 5★; a score wildly out of line with
     the written complaints; or all reviews old/stale. Treat these as untrustworthy.
-  - **Cross-check platforms:** if one platform glows but others warn, **trust the warnings.**
-    高德地图的 POI 评价真实度高，适合做交叉信源（高德不显示房价）。
+  - **评论必须双信源：携程 + 高德，缺一不可。** 单一平台不够可信——携程好评偏光鲜、运营痕迹重，高德 POI
+    评价更接近真实住客口碑。流程：携程筛「4.7 分以上」找候选连锁、读携程评论 → **同一家再去高德读一遍**
+    （`amap.com/search?query={城市}{酒店名}` → 点搜索按钮 → 点 POI →「评价」）→ 交叉比对，**携程光鲜但
+    高德有复发吐槽（旧/吵/窗户/卫生），信高德**。`.review-check` 写清两边各自说了什么。
 - **Prefer chains (连锁) when they fit — especially for 银发/亲子** (consistent cleanliness, standards,
   easy recourse): **华住会** (汉庭/全季/桔子/星程/宜必思/美居), **锦江** (锦江之星/7天/维也纳), **首旅如家**
   (如家/和颐). But a chain is **not an auto-pick** — a specific branch with bad recent reviews is still
