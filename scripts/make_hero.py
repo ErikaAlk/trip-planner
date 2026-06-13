@@ -116,16 +116,16 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
 .bar{{height:32px;background:#10182600;background:linear-gradient(#141d2e,#0e1521);display:flex;align-items:center;
   gap:7px;padding:0 13px;border-bottom:1px solid rgba(255,255,255,.06)}}
 .tl{{width:11px;height:11px;border-radius:50%}}
-.url{{margin-left:14px;flex:1;height:18px;border-radius:9px;background:rgba(255,255,255,.06);
-  display:flex;align-items:center;padding:0 10px;font-size:11px;color:#7e8eaa;max-width:260px}}
 .browser .shot{{width:100%;height:360px;object-fit:cover;object-position:top}}
-.phone{{position:absolute;left:600px;top:150px;width:218px;height:446px;border-radius:30px;
-  background:#070b12;border:1px solid rgba(255,255,255,.14);padding:9px 8px;
-  box-shadow:0 44px 70px -18px rgba(0,0,0,.78),0 0 60px -6px rgba(232,144,47,.5);
-  transform:rotateY(-13deg);z-index:6}}
-.notch{{position:absolute;left:50%;top:13px;transform:translateX(-50%);width:62px;height:6px;border-radius:6px;
-  background:rgba(255,255,255,.18);z-index:2}}
-.phone .shot{{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:23px;display:block}}
+/* iPhone 17 Pro Max — thin uniform titanium bezel, big radius, 19.5:9, Dynamic Island */
+.phone{{position:absolute;left:606px;top:150px;width:212px;height:460px;border-radius:50px;
+  background:linear-gradient(150deg,#2a2f37,#0c0f15 30%,#0c0f15 70%,#23272e);padding:5px;
+  box-shadow:0 44px 72px -18px rgba(0,0,0,.8),0 0 62px -6px rgba(232,144,47,.5),
+    inset 0 0 0 1px rgba(255,255,255,.10);transform:rotateY(-13deg);z-index:6}}
+.screen{{position:relative;width:100%;height:100%;border-radius:45px;overflow:hidden;background:#0b111c}}
+.island{{position:absolute;left:50%;top:11px;transform:translateX(-50%);width:84px;height:25px;
+  border-radius:14px;background:#000;z-index:3;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}}
+.phone .shot{{width:100%;height:100%;object-fit:cover;object-position:top;display:block}}
 
 .foot{{position:absolute;left:66px;bottom:30px;font-size:12.5px;color:#5d6c87;letter-spacing:.04em;z-index:5}}
 .foot b{{color:#8fa0bd;font-weight:600}}
@@ -164,11 +164,10 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
       <div class="bar">
         <span class="tl" style="background:#ff5f56"></span><span class="tl" style="background:#ffbd2e"></span>
         <span class="tl" style="background:#27c93f"></span>
-        <span class="url">成都4日游行程.html · 单文件 · 离线可看</span>
       </div>
       <img class="shot" src="{desk}">
     </div>
-    <div class="phone"><div class="notch"></div><img class="shot" src="{mob}"></div>
+    <div class="phone"><div class="screen"><div class="island"></div><img class="shot" src="{mob}"></div></div>
   </div>
 
   <div class="vig"></div>
