@@ -2,7 +2,7 @@
 
 # trip-planner | 查证型行程页
 
-> *「网上抄来的攻略,会把你送到闭馆的大门口。」*
+> *「AI 排的行程看着挺靠谱,营业时间、票价、评分却大多没查过。」*
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-trip--planner-blueviolet)](SKILL.md)
 [![skills.sh](https://img.shields.io/badge/skills.sh-Eric6286%2Ftrip--planner-ff4d4f)](https://skills.sh/Eric6286/trip-planner)
