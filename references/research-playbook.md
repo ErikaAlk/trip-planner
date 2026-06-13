@@ -150,9 +150,12 @@ recourse): **华住会** (汉庭 / 全季 / 桔子 / 星程 / 宜必思 / 美居
 and it suits the trip — flag the higher variance.
 
 **Multi-platform price (per night) — reuse the flight flow exactly.** Browser-check the same room/date on
-**携程 + 飞猪** (+ Booking/Agoda international)，评价交叉看**高德**。**不要默认「集团 App 会员价更低」**——
-实测华住会企业铂金会员价也未必低于携程，且华住会官网根本查不到价；会员价只有真读到了才能写。Cheapest
-tagged, query time noted, `.price-compare` block. **Same defer-and-
+**携程 + 飞猪** (+ Booking/Agoda international). **价格的第二家是飞猪，不是高德——高德没有房价。**
+**价格(携程+飞猪)和评论(携程+高德)是两套独立要求，别因为评论查了携程+高德就跳过飞猪价格**（真实翻车：
+agent 把"双源"当成查两家就完事，丢了飞猪比价）。一张卡 = 携程(价+评)+飞猪(价)+高德(评) 三次读；飞猪只有
+真连不上/验证码墙才如实标注并退估价。**不要默认「集团 App 会员价更低」**——实测华住会企业铂金会员价也未必
+低于携程，且华住会官网根本查不到价；会员价只有真读到了才能写。Cheapest tagged, query time noted,
+`.price-compare` block. **Same defer-and-
 batch login handling and query-only prohibitions as §1 flights** — you never log in / solve captchas /
 book. Search shapes: `"<酒店名> 大众点评 评价"`, `"<酒店名> 携程 价格 <日期>"`, `"<品牌> <区域> 店 怎么样 测评"`.
 

@@ -298,11 +298,21 @@ compare prices across platforms; read the actual review section; never book.**
   (如家/和颐). But a chain is **not an auto-pick** — a specific branch with bad recent reviews is still
   out; **reviews override the brand.** A boutique/民宿 is fine if its reviews are strong, specific, and
   authentic and it suits the trip — just flag the higher variance.
-- **Multi-platform price compare — same as flights.** Browser-check the **per-night** price on
-  **携程 + 飞猪**（Booking/Agoda for international），评价交叉看**高德地图**（查不了价，但 POI 评价真实，
-  是可靠评论信源）。**别默认「集团 App 会员价更低」**——实测未必，且华住会官网查不到价；会员价只有真读到才写。 **Use the same defer-and-batch login
-  handling and the query-only prohibitions from Step 2** (never log in / solve captchas yourself, never
-  book). Trains/flights/hotels all share that flow.
+- **价格和评论是两套独立的多源要求，都要做——别混为一谈（真实翻车点）。** 一次运行里 agent 把"评论双信源
+  携程+高德"当成了"查两家就完事"，于是**只碰了携程和高德，把飞猪价格比价整个丢了**。记牢这张表，三个平台
+  都要碰：
+
+  | 维度 | 必查平台 | 为什么不能互替 |
+  |---|---|---|
+  | **价格比价**（`.price-compare`） | **携程 + 飞猪**（国际加 Booking/Agoda） | 高德**没有房价**，不能当价格源 |
+  | **评论核验**（`.review-check`） | **携程 + 高德** | 飞猪评论不顶替高德；高德 POI 口碑更真 |
+
+  → 一张合格的酒店卡 = **携程（价+评）+ 飞猪（价）+ 高德（评）三次浏览器读**。查了携程+高德 ≠ 完成，飞猪价格
+  仍要查；只有飞猪真的连不上/验证码墙/未读到，才在那一行如实标「飞猪 · 验证码墙未读」并退到 web_search 估价
+  （标「估」），**绝不是默认不查飞猪**。
+- **别默认「集团 App 会员价更低」**——实测未必，且华住会官网查不到价；会员价只有真读到才写。**Use the same
+  defer-and-batch login handling and the query-only prohibitions from Step 2** (never log in / solve
+  captchas yourself, never book). Trains/flights/hotels all share that flow.
 - **Output** each option as a **hotel card** (chain badge, 评分 + 点评数, 区域/到地铁/到当天景点群的距离, a
   short **评论体检** note saying what reviews actually say, the multi-platform `.price-compare`, and a
   booking link). Pin the top pick on the map. Mark a 推荐 vs 次选/备选 if helpful. See
