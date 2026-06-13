@@ -18,8 +18,8 @@
 
 ---
 
-![成都4日游行程页 demo:主题头 → 活地图 → 住宿评论体检的滚动演示](assets/demo.gif)
-<sub>真实运行产物(成都 4 日银发亲子行程)滚动演示,非设计稿。GIF 由 `scripts/make_demo_gif.py` 从真页面重生成。完整文件见 [examples/成都4日游行程.html](examples/成都4日游行程.html)。</sub>
+![trip-planner hero:电脑端 + 手机端真实产物,内嵌活地图、实价比价、查证不编造](assets/hero.png)
+<sub>主视觉由 `scripts/make_hero.py` 用真实运行截图(`hero-desktop.png` + `mobile.png`)合成,非设计稿。完整产物见 [examples/成都4日游行程.html](examples/成都4日游行程.html)。</sub>
 
 ---
 
@@ -40,7 +40,9 @@
 老人家走不动太多路,节奏悠闲点,帮我做个行程。
 ```
 
-**输出**(同一次运行的三个截面):
+**输出**(同一次运行的滚动演示 + 三个截面):
+
+![成都4日游行程页滚动演示:主题头 → 活地图 → 住宿评论体检](assets/demo.gif)
 
 | 逐日时间线 + 交通段卡 | 住宿备选(评论体检) | 手机端 |
 |---|---|---|
