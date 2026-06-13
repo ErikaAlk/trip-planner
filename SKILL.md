@@ -23,7 +23,9 @@ text — batched by dependency layer, each question carrying a recommended answe
 **Browser scraping — read the DOM with `javascript_tool`, don't screenshot-and-eyeball.** 查机票/酒店价、
 携程/高德评论时，**优先用 `javascript_tool` 抓 DOM 取结构化 JSON**（省 token，且绕开高德 canvas 截图报错——
 评价在 HTML 面板里，JS 抓得到）。探测脚本 + 各站点已复验选择器模板见 **`references/scraping-method.md`**；
-只在确认加载/需要视觉/canvas 内容时才截图。
+只在确认加载/需要视觉/canvas 内容时才截图。**保存的选择器只是"自检缓存"、会过期——取到 0 条就按该文档
+§八 自愈降级（探测脚本 → 锚定内容模式 ¥/HH:MM/日期 → 语义兜底），别干等、别放弃；自愈失败仍取不到，就如实
+标「未读到 · 以官网为准」，绝不编。**
 
 **Output path.** Write the final HTML to the current working directory (or a directory the user
 names). Filename: `<目的地><N>日游行程.html` (e.g. `东京5日游行程.html`).

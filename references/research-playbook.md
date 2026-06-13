@@ -115,7 +115,9 @@ wait + **1 张**截图确认加载；② 跑探测脚本定位重复卡片的容
 要点：CSS-modules 哈希类名（携程点评/高德评价）用 `[class*="稳定前缀"]` 包含匹配、别写死哈希后缀；懒加载用
 JS 滚动循环；清零宽字符、按内容去重；**高德评价在 HTML 面板里(JS 可抓)，只有背景地图是 canvas(才截图)**。
 已验证选择器：携程机票 `.flight-box`（滤掉首个广告位）、高德评价 `[class*="ReviewList_reviewItem__"]`、
-携程点评 `[class*="reviewSwiper_reviewSwiper-item"]`。
+携程点评 `[class*="reviewSwiper_reviewSwiper-item"]`。**这些选择器会随发版过期——是"自检缓存"不是信仰；
+取到 0 条就按 scraping-method.md §八 自愈（探测脚本 → 锚定内容模式 ¥/HH:MM/日期/航班号 → 语义兜底 → 截图），
+并把发现的新选择器写回模板。真正不变的是"锚定内容、不锚定类名"。**
 
 **Stop-and-hand-back triggers (do not cross these):**
 - Login / account / password prompt → stop.
