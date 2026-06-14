@@ -117,10 +117,14 @@ the HTML rather than guessing.
 | **需浏览器但基本不反爬**：航司官网(东航/国航/南航/吉祥)、Google Flights、Skyscanner、景点官网、一般 JS 渲染页 | **`agent-browser` CLI**（vercel-labs，Rust，走 Bash）优先 | 命令行返回紧凑文本、不靠截图,省 token、可脚本化、可复现 |
 | **纯静态/有公开数据** | `web_search` / 直接 fetch | 连浏览器都不用 |
 
-**`agent-browser` 用法**（官方 README 实证;本机首次需 `npm i -g agent-browser` + `agent-browser install`）：
-`agent-browser open <url>` → `agent-browser eval '<js>'`(等价 `javascript_tool`,抓结构化 JSON)/
-`get text|html|attr <sel>` / `batch`(一次多命令) / `snapshot`(无障碍树带 ref,语义化定位、比写死类名抗失效)。
-要复用登录态用 `--profile <name>`。**但反爬站一律不走它**——见上表,那是真实 Chrome 的活。
+**`agent-browser` 用法**（本机已装并实测可用：v0.27.3 + Chrome for Testing 149，Windows 下 open/eval/get/
+close 全通；首次装见末注）：`agent-browser open <url>` → `agent-browser eval '<js>'`(等价 `javascript_tool`,
+抓结构化 JSON)/ `get text|html|attr|count <sel>` / `find role|text <值> <动作>`(语义化定位) /
+`snapshot`(无障碍树带 ref,比写死类名抗失效) / `diff snapshot` / `close`。复用登录态用 `--profile <name>`。
+**复杂 JS 用 base64 传(`eval -b <base64>`)或 `--stdin`,别在 shell 里塞嵌套引号**(实测:嵌套 `"` 会卡)。
+**反爬站一律不走它**——见上表,那是真实 Chrome 的活。
+> 首次安装(已完成):`npm i -g agent-browser` 然后 `agent-browser install`(从 Google 官方 Chrome for
+> Testing 下 ~184MB);自带 `agent-browser skills get core` 用法指南。
 
 Use **Claude in Chrome** or **Windows-MCP** (whichever is installed) **only** to read live
 availability / exact fares on 携程 / 飞猪 / 航司官网 / 12306. It is a read-only lookup, not a booking flow.
