@@ -109,6 +109,19 @@ the HTML rather than guessing.
 
 ## 2. Browser automation — only when search isn't enough
 
+### 浏览器工具路由（按"反爬强度"分流，省 token 又不挂）
+
+| 站点类型 | 用什么 | 为什么 |
+|---|---|---|
+| **反爬/登录/验证码重**：携程·飞猪·高德·小红书·12306 | **真实 Chrome**（Claude in Chrome MCP / Windows-MCP，驱动用户日常浏览器） | 真人指纹最不易被风控；撞验证码能让用户在可见窗口手动过；登录态现成 |
+| **需浏览器但基本不反爬**：航司官网(东航/国航/南航/吉祥)、Google Flights、Skyscanner、景点官网、一般 JS 渲染页 | **`agent-browser` CLI**（vercel-labs，Rust，走 Bash）优先 | 命令行返回紧凑文本、不靠截图,省 token、可脚本化、可复现 |
+| **纯静态/有公开数据** | `web_search` / 直接 fetch | 连浏览器都不用 |
+
+**`agent-browser` 用法**（官方 README 实证;本机首次需 `npm i -g agent-browser` + `agent-browser install`）：
+`agent-browser open <url>` → `agent-browser eval '<js>'`(等价 `javascript_tool`,抓结构化 JSON)/
+`get text|html|attr <sel>` / `batch`(一次多命令) / `snapshot`(无障碍树带 ref,语义化定位、比写死类名抗失效)。
+要复用登录态用 `--profile <name>`。**但反爬站一律不走它**——见上表,那是真实 Chrome 的活。
+
 Use **Claude in Chrome** or **Windows-MCP** (whichever is installed) **only** to read live
 availability / exact fares on 携程 / 飞猪 / 航司官网 / 12306. It is a read-only lookup, not a booking flow.
 
