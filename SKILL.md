@@ -83,7 +83,7 @@ names). Filename: `<目的地><N>日游行程.html` (e.g. `东京5日游行程.h
 
 ---
 
-## Run it as a workflow (plan → research → verify → assemble)
+## 工作流总览（plan → research → verify → assemble）
 
 Don't free-write a plan in one pass. The quality comes from the structure:
 
@@ -102,9 +102,21 @@ Don't free-write a plan in one pass. The quality comes from the structure:
 
 The six steps below are mandatory and **in order**. Do not skip Step 1.
 
+复制下面这张清单到你的回复里，边做边勾（复杂行程尤其要这样跟踪进度）：
+
+```
+行程进度：
+- [ ] Step 1 · 需求采集（grill 问透；回读确认才进下一步）
+- [ ] Step 2 · 机票/火车票查询（机票浏览器实查比价，只读不订）
+- [ ] Step 3 · 天气 + 逐点真实数据（营业时间/闭馆日/小红书避坑）
+- [ ] Step 4 · 行程编排（地理聚类、时间预算、通勤连接、体力曲线）
+- [ ] Step 5 · 住宿备选 ≥3（价格携程+飞猪、评论携程+高德，浏览器实查）
+- [ ] Step 6 · 输出 HTML + 跑 check_html.py 至通过
+```
+
 ---
 
-## Step 1 — 需求采集（GRILL，问透为止 — never skip, never jump straight to an itinerary）
+## Step 1 — 需求采集（GRILL 式访谈，问透为止）
 
 **This is the most common failure mode: producing a generic itinerary before knowing who's traveling
 and what they want. Don't.** 需求采集采用 **grill 式访谈**（方法源自 [grill-me](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md)）：
@@ -159,6 +171,8 @@ Escape hatch：用户说"你直接安排就行 / just decide for me"时不再追
 ## Step 2 — 机票 / 火车票查询（只查询，不下单）
 
 Fit the itinerary to real arrival/departure times — but **only read, never book.**
+本步全程遵守上面的 **数据诚信契约**（价格只写本会话浏览器实查到的，没查到就 hedge）；常见翻车案例见
+`references/lessons-learned.md`。
 
 1. **First pass — `web_search`.** Find candidate 班次/航班 (times, duration, rough price range,
    train/flight number). Examples: "上海 到 成都 航班 时刻", "北京 西安 高铁 时刻表 票价". Capture 2–3
@@ -274,11 +288,10 @@ so the checker knows the omission is deliberate. `check_html.py` fails the build
 Give the user **at least 3 hotel options (备选), not one** — placed near the itinerary's geographic
 clusters / transit and matching their 住宿位置偏好 from Step 1.
 
-**浏览器核实对酒店是强制项，和机票同级——必须主动去连、去查，不是"有机票才连浏览器"。**
-（这是真实翻车点：一次纯火车的行程里，agent 以为"机票才是 skill 强制要浏览器的那项"，于是**压根没去连
-Chrome**，酒店直接走了 web_search 估价。错。）只要本行程要选酒店（非"已订"），你就**必须主动尝试启动/连接
-浏览器**（Claude in Chrome / Windows-MCP / Desktop Commander，哪个连着用哪个），对**价格和评论都**实查——
+**浏览器实查对酒店是强制项，和机票同级。** 只要本行程要选酒店（非"已订"），你就**必须主动尝试启动/连接
+浏览器**（Claude in Chrome / Windows-MCP / Desktop Commander，哪个连着用哪个），对**价格和评论都**浏览器实查——
 和 Step 2 机票一字不差的纪律。**有没有机票，与酒店要不要连浏览器，毫无关系。**
+（这条来自真实翻车点 **L1**，案例见 `references/lessons-learned.md`。）
 
 - **价格**：浏览器读现役平台（携程/飞猪）实时价。只有在**真的尝试过、确认没有浏览器可用**（没连上 / 用户
   跳过）时，才退到 web_search 区间，并标「web_search 估价 · 未浏览器核实」。**默认就走估价、不去连浏览器 = 违规。**
@@ -311,9 +324,7 @@ compare prices across platforms; read the actual review section; never book.**
   (如家/和颐). But a chain is **not an auto-pick** — a specific branch with bad recent reviews is still
   out; **reviews override the brand.** A boutique/民宿 is fine if its reviews are strong, specific, and
   authentic and it suits the trip — just flag the higher variance.
-- **价格和评论是两套独立的多源要求，都要做——别混为一谈（真实翻车点）。** 一次运行里 agent 把"评论双信源
-  携程+高德"当成了"查两家就完事"，于是**只碰了携程和高德，把飞猪价格比价整个丢了**。记牢这张表，三个平台
-  都要碰：
+- **价格和评论是两套独立的多源要求，都要做——别混为一谈。** 记牢这张表，三个平台都要碰：
 
   | 维度 | 必查平台 | 为什么不能互替 |
   |---|---|---|
@@ -323,11 +334,11 @@ compare prices across platforms; read the actual review section; never book.**
   → 一张合格的酒店卡 = **携程（价+评）+ 飞猪（价）+ 高德（评）三次浏览器读**。查了携程+高德 ≠ 完成，飞猪价格
   仍要查；只有飞猪真的连不上/验证码墙/未读到，才在那一行如实标「飞猪 · 验证码墙未读」并退到 web_search 估价
   （标「估」），**绝不是默认不查飞猪**。`check_html.py` 会 FAIL 任何「飞猪只写了"订前自己比"却没真查」的酒店卡。
-  - **一个源失败，绝不连累另一个（真实翻车点）。** 一次运行里高德评论没加载出来，agent 就写「高德/飞猪我没
-    核到」——把价格源飞猪和评论源高德捆在一起一起放弃了。**高德（评论源）失败，与飞猪（价格源）该不该查，
-    毫无关系**；反之亦然。一个挂了就单独如实标它挂了，另一个照查。
+  - **一个源失败，绝不连累另一个。** 高德（评论源）失败，与飞猪（价格源）该不该查毫无关系；反之亦然。
+    一个挂了就单独如实标它挂了，另一个照查。
   - **高德评论是懒加载——别太早下"没评价"的结论。** 点开 POI 后 wait 3–5s、必要时在详情面板内下滚一下再读；
-    搜索若默认跳了北京＝没解析到城市，把城市名加进 query 重搜+点搜索按钮。「高德没返回评价」十有八九是没等够。
+    搜索若默认跳了北京＝没解析到城市，把城市名加进 query 重搜+点搜索按钮。
+  - 以上三条来自真实翻车点 **L2 / L3 / L4**，完整案例与根因见 `references/lessons-learned.md`。
 - **别默认「集团 App 会员价更低」**——实测未必，且华住会官网查不到价；会员价只有真读到才写。**Use the same
   defer-and-batch login handling and the query-only prohibitions from Step 2** (never log in / solve
   captchas yourself, never book). Trains/flights/hotels all share that flow.
@@ -386,7 +397,7 @@ localStorage-backed `.checklist`. Re-run until clean, then tell the user where t
 
 ---
 
-## Output spec summary (the retargeted規范, for quick reference)
+## 输出规范速查（the retargeted spec, for quick reference）
 
 The full spec is in `references/design-system.md`. In brief, what changed from study-notes:
 
@@ -402,10 +413,32 @@ The full spec is in `references/design-system.md`. In brief, what changed from s
 
 ---
 
-## Test prompts
+## 维护与迭代（约定 + 持续学习）
 
-After building the skill, try these (they exercise requirements-gathering, English input, and the
-train-query path):
+**语言与术语约定（写新内容、改旧内容都照此，保持一致）：**
+
+- **正文规则 / 旅行领域指引 → 中文优先**（读者是中文出行者）；英文只用于行内技术名词、`代码标识符`、组件类名。
+- **章节标题 → 统一 `## Step N — <中文标题>` 句式**；非步骤的章节用中文标题（可带英文小注）。
+- **代码 / CSS / 组件 / 工具名 → 英文原样**（`.hotel`、`.price-compare`、`web_search`、`javascript_tool`），
+  MCP 工具用全限定名以防找不到。
+- **一个概念只用一个词。** 浏览器核验这一动作在正文统一叫 **「浏览器实查」**（不要再写「浏览器核实/浏览器实读」
+  当动词）。
+- **输出标签是受控固定串，不许改写或换近义词**（`check_html.py` 和示例 HTML 依赖它们）：
+  正向来源标记 `实查于 YYYY-MM-DD` / `浏览器实读点评区` / `浏览器实查…日期` / `高德实测` /
+  `以12306为准`；未查到的 hedge `以官网为准` / `评分以 App 为准` / `web_search · 未浏览器核实` 等；
+  受控『已验证』词表见 数据诚信契约。
+
+**这个 skill 是活文档，靠真实运行喂养。** 每次真实运行后：观察哪里翻车 → 在
+`references/lessons-learned.md` 登记一条 L（症状/根因）→ 把结论蒸馏成一句强约束规则写回本文件 →
+在 `evals/evals.json` 加一条复现用例 →（坑若结构可检测）在 `scripts/check_html.py` 加一条校验。
+完整循环与已登记的 L1–L7 见 **`references/lessons-learned.md`**。
+
+---
+
+## 测试用例（quick smoke tests）
+
+**权威用例集是 `evals/evals.json`**（含触发 / 反触发用例）——以它为准，新增用例先加到那里。
+下面 3 条是快速冒烟测试，覆盖需求采集、英文输入、火车查询三条路径：
 
 1. **`下个月中旬带爸妈去成都玩4天,从上海出发,预算中等,想看大熊猫、吃地道川菜,老人家走不动太多路,节奏悠闲点,帮我做个行程。`**
    — 银发亲子 + most info given; should confirm only the few missing bits, then plan light-paced days

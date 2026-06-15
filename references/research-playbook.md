@@ -6,6 +6,19 @@ addresses, or schedules.** A confidently wrong opening time is worse than an hon
 
 ---
 
+## Contents
+
+1. Web search patterns (the fast default)
+2. Browser automation — only when search isn't enough
+2.5 Hotels — vet the reviews, prefer chains, compare prices
+3. Time-budget rules of thumb
+4. Geographic clustering
+5. Meals, constraints, energy, Plan B
+6. Map coordinates
+7. Honesty & safety recap
+
+---
+
 ## 1. Web search patterns (the fast default)
 
 Run focused searches and read 2–3 sources before asserting a fact. Useful query shapes:
