@@ -122,12 +122,13 @@ trip-planner/
 ├── references/
 │   ├── design-system.md            # HTML 输出规范(脚手架/CSS/JS + 全部组件)
 │   ├── research-playbook.md        # 检索/浏览器比价/选酒店方法
-│   └── scraping-method.md          # 高效抓取(JS读DOM替代截图)+各站点实测选择器模板
+│   ├── scraping-method.md          # 高效抓取(JS读DOM替代截图)+各站点实测选择器模板
+│   └── lessons-learned.md          # 真实翻车点登记册(L1–L7) + 持续迭代维护流程
 ├── scripts/
 │   ├── check_html.py               # 输出静态校验(地图/坐标/住宿/预算/清单/自包含)
 │   └── make_showcase.sh            # 从真实产物重新生成 README 截图(可复现)
 ├── evals/
-│   ├── evals.json                  # 2 个标准测试 prompt + 期望输出
+│   ├── evals.json                  # 3 个功能用例 + 触发/反触发测试 + 期望输出
 │   └── benchmark.md                # with/without skill 对照实验数据
 ├── examples/成都4日游行程.html      # 一次真实运行的完整产物
 └── assets/                         # README 截图(全部出自真实产物)

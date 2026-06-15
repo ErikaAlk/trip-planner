@@ -16,6 +16,23 @@ Copy the CSS block and the HTML/JS template **verbatim**, then fill in the conte
 
 ---
 
+## Contents
+
+- What is kept from study-notes vs. what is new
+- Full CSS
+- HTML Page Template
+- Layout Consistency Rule (MANDATORY)
+- Themed hero header (use on EVERY trip)
+- Chips — wrap short items as pills anywhere
+- Day-level details: transit · daily overview · per-day budget · flight price-compare
+- Hotels (住宿备选)
+- Callout Quick Reference (travel semantics)
+- Section Color Assignment
+- Map data rules
+- Self-contained file
+
+---
+
 ## What is kept from study-notes vs. what is new
 
 | Mechanism | Status |

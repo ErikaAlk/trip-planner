@@ -14,6 +14,45 @@
       "prompt": "9月23到26号去西安，兵马俑、城墙、回民街都想去，顺便帮我看下从北京出发的高铁大概几点有车、大概多少钱。",
       "expected_output": "西安4日游标准HTML行程：含北京→西安高铁查询(只读，班次时刻+票价区间放进交通段卡片，带预订链接，不下单)；兵马俑/城墙/回民街按地理聚类排日，避开闭馆/检修，标注需提前订票；主题化头部+地图+预算表+清单+callout；住宿备选≥3张.hotel卡(评论体检+多平台比价，用户未提酒店也必须有)；遵守数据诚信契约：未实查的评分/票价/车次/打车费/天气一律hedge不编造，没浏览器读评论就不写评分数字与评论结论。",
       "files": []
+    },
+    {
+      "id": 2,
+      "name": "tokyo-couple-food-anime",
+      "prompt": "Plan a 5-day Tokyo itinerary for the two of us in early July, flying from Shanghai. We love food and anime (Akihabara), want one day-trip outside the city, mid-range budget, and don't mind a packed schedule.",
+      "expected_output": "Tokyo 5-day standalone HTML itinerary in response to English input: confirms the few missing prefs first, then themed hero + Leaflet map + per-day POI timeline clustered by district (Akihabara/食 day, one out-of-city day-trip e.g. 镰仓/日光/箱根) + transport-segment card fitting the SHA→NRT/HND flight to Day 1 and the return to Day 5 with realistic airport buffers + .price-compare for flights (browser-verified incl 携程/飞猪/航司官网, cheapest tagged) + budget table + checklist. Packed-but-honest time budgets; 住宿备选≥3 .hotel cards (携程+飞猪 price, 携程+高德 reviews); obeys 数据诚信契约 — no fabricated hours/prices/ratings, hedge when not browser-verified.",
+      "files": []
+    }
+  ],
+  "trigger_tests": [
+    {
+      "prompt": "国庆想去重庆耍三天，帮我整个安排一下吧",
+      "should_trigger": true,
+      "reason": "目的地+天数+规划意图（paraphrase，未用「行程/攻略」关键词也应触发）"
+    },
+    {
+      "prompt": "things to do in Osaka for a long weekend, we're into food",
+      "should_trigger": true,
+      "reason": "英文 things-to-do + 地点 + 时长，命中描述里的英文触发词"
+    },
+    {
+      "prompt": "下周末杭州两日游",
+      "should_trigger": true,
+      "reason": "最小触发：目的地 + 时长（X日游）即应主动触发"
+    },
+    {
+      "prompt": "帮我把这章微积分笔记整理成一份复习资料",
+      "should_trigger": false,
+      "reason": "学习笔记，应交给 study-notes，不是旅行规划"
+    },
+    {
+      "prompt": "做一份 Q3 销售业绩的可视化分析报告",
+      "should_trigger": false,
+      "reason": "通用商业报告，应交给 visual-report"
+    },
+    {
+      "prompt": "帮我写个 Python 脚本批量重命名文件夹里的图片",
+      "should_trigger": false,
+      "reason": "与出行完全无关，不得过触发"
     }
   ]
 }
