@@ -150,6 +150,7 @@ python3 scripts/check_html.py <输出>.html      # macOS/Linux
 - **2026-06-16 · v0.17** — 同步 study-notes 的设计系统修复（暗色对比度 + 表格细滚动条）。
   - **暗色模式撞色修复**：暗色 `:root` 此前只覆盖 `*-light` 背景，`*-dark` 文本与基础强调色仍是亮色值 → 行程里的 chips/pills、主题头部 pills、分区标题在深色下暗底暗字（实测 teal-dark/teal-light 仅 1.46:1）。补齐暗色基础强调色 + `*-dark`，实测回到 6.8–9.9:1。设计系统与 study-notes / visual-report 同源，这是三者共有的 bug，本轮一并修。
   - **宽表格细滚动条**：预算表等宽表在窄屏横向滚动时，把刺眼的系统白滚动条换成主题化细滚动条（thumb=`--text2`、去掉 stepper 箭头），仅在真正溢出时出现。
+  - **展示素材刷新**：`examples/成都4日游行程.html` 按新设计规范就地更新，README 全部截图（hero、timeline/hotels 桌面图、mobile、demo.gif）从更新后的真实产物重出——暗色模式下头部 chips、住宿/时间线卡片的标签、分区标题不再撞色。
 
 - **2026-06-13 · v0.16** — 小红书也纳入高效抓取(`scraping-method.md` §六点五,用户补充+本轮复验):搜索列表 `.note-item` 实测取到 20–22 条带标题/作者/点赞——**这一层通常就够攻略佐证**(多篇互证 + 点赞判热度 + 标题鉴别软广)。复验发现一个真坑:**含 xsec_token 的笔记链接会被 harness 隐私防护拦**(`[BLOCKED: Cookie/query string data]`),所以**别抽 token URL 再导航,要直接点击 note 打开浮层**(token 在点击里走);笔记浮层正文/评论要 scope 到 `.note-detail-mask` 防串数据。五条反爬约束(登录态/token/浮层/防滑块/视频笔记)都写进文档。
 
