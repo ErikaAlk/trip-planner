@@ -62,6 +62,16 @@ Copy the CSS block and the HTML/JS template **verbatim**, then fill in the conte
     --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
     --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
     --red-light:#501313; --pink-light:#4B1528;
+    /* CRITICAL dark-mode contrast fix (synced from study-notes). The block above only re-darkens
+       the *-light BACKGROUNDS; without the lines below, the base accents and the *-dark TEXT
+       colours keep their light-mode (dark) values, so every "accent text on accent-light
+       background" pairing — chips/pills (.b-*), the themed header pills, section headings,
+       callout icons — becomes dark-on-dark and unreadable (old teal-dark on teal-light measured
+       1.46:1). Brightening restores 6.8–9.9:1. *-mid are already bright; leave them. */
+    --purple:#9A92E6; --teal:#3FB389; --coral:#E07B52; --amber:#E89A2A;
+    --blue:#5B9FE0; --green:#7FB23E; --red:#E07676; --pink:#D87B9C;
+    --purple-dark:#C7C2F5; --teal-dark:#74D6B0; --coral-dark:#F4A487; --amber-dark:#F2B75A;
+    --blue-dark:#92C2F0; --green-dark:#A6CF6B; --red-dark:#F2A6A6;
   }
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -77,6 +87,12 @@ body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-lef
 }
 /* Wide tables may scroll horizontally on the table element itself */
 table{overflow-x:auto;display:block;}
+/* thin, theme-aware scrollbar for wide tables (synced from study-notes) — far less jarring than
+   the native white bar, and only appears when the table actually overflows */
+table{scrollbar-width:thin;scrollbar-color:var(--text2) transparent;}
+table::-webkit-scrollbar{height:7px;}
+table::-webkit-scrollbar-thumb{background:var(--text2);border-radius:4px;}
+table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 
 /* ── Themed hero header ── a gradient banner keyed to the trip's subject.
    Always give .header one theme-* class; optionally one deco-* overlay.
