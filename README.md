@@ -5,8 +5,8 @@
 > *「AI 排的行程看着挺靠谱,营业时间、票价、评分却大多没查过。」*
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-trip--planner-blueviolet)](SKILL.md)
-[![skills.sh](https://img.shields.io/badge/skills.sh-Eric6286%2Ftrip--planner-ff4d4f)](https://skills.sh/Eric6286/trip-planner)
-[![ClawHub](https://img.shields.io/badge/ClawHub-eric6286%2Ftrip--planner-7c3aed)](https://clawhub.ai/eric6286/trip-planner)
+[![skills.sh](https://img.shields.io/badge/skills.sh-ErikaAlk%2Ftrip--planner-ff4d4f)](https://skills.sh/ErikaAlk/trip-planner)
+[![ClawHub](https://img.shields.io/badge/ClawHub-ErikaAlk%2Ftrip--planner-7c3aed)](https://clawhub.ai/ErikaAlk/trip-planner)
 [![Runtime](https://img.shields.io/badge/Claude%20Code-ready-blue)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -64,13 +64,13 @@
 一行安装(推荐):
 
 ```bash
-npx skills add Eric6286/trip-planner
+npx skills add ErikaAlk/trip-planner
 ```
 
 或手动克隆:
 
 ```bash
-git clone https://github.com/Eric6286/trip-planner ~/.claude/skills/trip-planner
+git clone https://github.com/ErikaAlk/trip-planner ~/.claude/skills/trip-planner
 ```
 
 装完对 Claude Code 说(可直接复制):
