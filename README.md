@@ -5,8 +5,8 @@
 > *「AI 排的行程看着挺靠谱,营业时间、票价、评分却大多没查过。」*
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-trip--planner-blueviolet)](SKILL.md)
-[![skills.sh](https://img.shields.io/badge/skills.sh-Eric6286%2Ftrip--planner-ff4d4f)](https://skills.sh/Eric6286/trip-planner)
-[![ClawHub](https://img.shields.io/badge/ClawHub-eric6286%2Ftrip--planner-7c3aed)](https://clawhub.ai/eric6286/trip-planner)
+[![skills.sh](https://img.shields.io/badge/skills.sh-ErikaAlk%2Ftrip--planner-ff4d4f)](https://skills.sh/ErikaAlk/trip-planner)
+[![ClawHub](https://img.shields.io/badge/ClawHub-ErikaAlk%2Ftrip--planner-7c3aed)](https://clawhub.ai/ErikaAlk/trip-planner)
 [![Runtime](https://img.shields.io/badge/Claude%20Code-ready-blue)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -64,13 +64,13 @@
 一行安装(推荐):
 
 ```bash
-npx skills add Eric6286/trip-planner
+npx skills add ErikaAlk/trip-planner
 ```
 
 或手动克隆:
 
 ```bash
-git clone https://github.com/Eric6286/trip-planner ~/.claude/skills/trip-planner
+git clone https://github.com/ErikaAlk/trip-planner ~/.claude/skills/trip-planner
 ```
 
 装完对 Claude Code 说(可直接复制):
@@ -146,6 +146,8 @@ python3 scripts/check_html.py <输出>.html      # macOS/Linux
 校验器检查:`<div>` 平衡、Leaflet 接线、每个地图点的数字坐标、无模板残留、自包含、以及旅行组件是否真实落地(≥3 住宿卡/预算表/清单)。对照实验方法与数据见 [evals/benchmark.md](evals/benchmark.md)。
 
 ## 更新记录
+
+- **2026-06-20 · v0.18** — 生态对标:评估了 [anysearch-skill](https://github.com/anysearch-ai/anysearch-skill)(给 agent 用的统一搜索 API)能否进工作流,结论**不纳入**——它只能改进契约里已被降级的 web_search 层、碰不到三类强制浏览器数据(机票/酒店实时价、真实评论区),且中国主战场(携程/飞猪/高德/12306/小红书)零具名覆盖、供应商发布仅 6 周创始人匿名。完整「症状→理由→未来复评的唯一窄口子(燃油/官方静态页 extract)+六道门槛」记进 `references/lessons-learned.md` 新增的「对标观察登记册」B1。**本轮不改任何运行行为**,纯留对标记忆。
 
 - **2026-06-16 · v0.17** — 同步 study-notes 的设计系统修复（暗色对比度 + 表格细滚动条）。
   - **暗色模式撞色修复**：暗色 `:root` 此前只覆盖 `*-light` 背景，`*-dark` 文本与基础强调色仍是亮色值 → 行程里的 chips/pills、主题头部 pills、分区标题在深色下暗底暗字（实测 teal-dark/teal-light 仅 1.46:1）。补齐暗色基础强调色 + `*-dark`，实测回到 6.8–9.9:1。设计系统与 study-notes / visual-report 同源，这是三者共有的 bug，本轮一并修。

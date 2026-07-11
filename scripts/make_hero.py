@@ -169,7 +169,7 @@ h1 .hl{{background:linear-gradient(92deg,#34e0c4,#7fe3ff);-webkit-background-cli
   </div>
 
   <div class="vig"></div>
-  <div class="foot"><b>github.com/Eric6286/trip-planner</b> &nbsp;·&nbsp; 单文件 HTML · Leaflet 活地图 · 零 API key</div>
+  <div class="foot"><b>github.com/ErikaAlk/trip-planner</b> &nbsp;·&nbsp; 单文件 HTML · Leaflet 活地图 · 零 API key</div>
 </div></body></html>"""
 
 
