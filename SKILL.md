@@ -354,6 +354,18 @@ compare prices across platforms; read the actual review section; never book.**
 **Read `references/design-system.md` and follow it exactly.** Build ONE standalone HTML file
 containing:
 
+- **A direction on `<html data-theme="…">`** — the *body* look. This is a **separate axis** from the
+  hero's `theme-*` (which is the *destination's* mood); the two combine freely.
+
+  | 这份行程是 | `data-theme` |
+  |---|---|
+  | 慢旅行、休闲游、想留作纪念 — **拿不准就这套** | `journal`（默认：衬线正文、取消卡片、零圆角、780px 窄版心） |
+  | 发给别人看的、种草贴、纪念页 | `magazine`（大号衬线标题 44/30/21、留白、一支洋红） |
+
+  Keep one direction for the whole file. **Day colors still cycle seven ways in every direction** —
+  they are the cross-day wayfinding cue and they match the map's route colors, so never collapse
+  them to a single hue.
+
 - **Themed hero header** (required, on every trip): a gradient banner keyed to the trip's subject
   (`theme-night/ocean/sunset/forest/city/sakura/snow/desert`, optional `deco-stars`/`deco-glow`, or a
   custom gradient from the destination's palette), with the headline facts wrapped as translucent
