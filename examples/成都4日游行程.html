@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="journal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +13,8 @@
 <style>
 :root {
   --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
+  /* text3 由 #8a8a84 调深：旧值在 --bg2 卡片上只有 3.21:1，低于 AA。目录标题、地图说明、
+     比价标题、换乘箭头都吃它。保持色相只调明度解得。 */
   --text:#1a1a18; --text2:#5a5a56; --text3:#70706B;
   --border:rgba(0,0,0,0.11);
   --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
@@ -33,6 +35,12 @@
     --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
     --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
     --red-light:#501313; --pink-light:#4B1528;
+    /* CRITICAL dark-mode contrast fix (synced from study-notes). The block above only re-darkens
+       the *-light BACKGROUNDS; without the lines below, the base accents and the *-dark TEXT
+       colours keep their light-mode (dark) values, so every "accent text on accent-light
+       background" pairing — chips/pills (.b-*), the themed header pills, section headings,
+       callout icons — becomes dark-on-dark and unreadable (old teal-dark on teal-light measured
+       1.46:1). Brightening restores 6.8–9.9:1. *-mid are already bright; leave them. */
     --purple:#9A92E6; --teal:#3FB389; --coral:#E07B52; --amber:#E89A2A;
     --blue:#5B9FE0; --green:#7FB23E; --red:#E07676; --pink:#D87B9C;
     --purple-dark:#C7C2F5; --teal-dark:#74D6B0; --coral-dark:#F4A487; --amber-dark:#F2B75A;
@@ -52,12 +60,17 @@ body>*:not(.page){max-width:900px;margin-left:auto;margin-right:auto;padding-lef
 }
 /* Wide tables may scroll horizontally on the table element itself */
 table{overflow-x:auto;display:block;}
+/* thin, theme-aware scrollbar for wide tables (synced from study-notes) — far less jarring than
+   the native white bar, and only appears when the table actually overflows */
 table{scrollbar-width:thin;scrollbar-color:var(--text2) transparent;}
 table::-webkit-scrollbar{height:7px;}
 table::-webkit-scrollbar-thumb{background:var(--text2);border-radius:4px;}
 table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 
-/* ── Themed hero header ── */
+/* ── Themed hero header ── a gradient banner keyed to the trip's subject.
+   Always give .header one theme-* class; optionally one deco-* overlay.
+   Text sits at z-index:1 above the decorative ::after layer. Works in light
+   AND dark mode (it's a self-contained dark banner with light text). */
 .header{position:relative;overflow:hidden;text-align:center;color:#f4f3ff;
   border-radius:18px;padding:54px 28px 40px;margin:0 0 42px;
   background:linear-gradient(160deg,#27408b 0%,#3a3f8f 45%,#1d8a6e 100%);}
@@ -66,19 +79,23 @@ table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 .header .subtitle{font-size:14px;margin-bottom:18px;position:relative;z-index:1;
   color:rgba(255,255,255,0.82);line-height:1.7;}
 .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;}
+/* translucent pills that read on any gradient — the "包起来" look */
 .tag{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;
   font-size:12px;font-weight:600;color:#fff;
   background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);}
 
-.theme-night {background:linear-gradient(160deg,#1a1f4b 0%,#2d2a6e 38%,#0f6e56 100%);}
-.theme-ocean {background:linear-gradient(160deg,#0b3a6f 0%,#1167a8 45%,#1d9e9e 100%);}
-.theme-sunset{background:linear-gradient(160deg,#6e2545 0%,#c0432f 50%,#e7972a 100%);}
-.theme-forest{background:linear-gradient(160deg,#123421 0%,#1f6e4e 50%,#3f8a3a 100%);}
-.theme-city  {background:linear-gradient(160deg,#232a45 0%,#34407a 50%,#4d6fae 100%);}
-.theme-sakura{background:linear-gradient(160deg,#8a3a6b 0%,#b65a86 45%,#7b6fd0 100%);}
-.theme-snow  {background:linear-gradient(160deg,#243b63 0%,#3f6fb0 55%,#86b6e6 100%);}
-.theme-desert{background:linear-gradient(160deg,#5e3417 0%,#b5762f 52%,#dcab53 100%);}
+/* Theme gradient presets — pick the one matching the trip's mood, or write a
+   custom `background:linear-gradient(...)` inline on .header to fit the place. */
+.theme-night {background:linear-gradient(160deg,#1a1f4b 0%,#2d2a6e 38%,#0f6e56 100%);} /* 观星/沙漠夜/极光 */
+.theme-ocean {background:linear-gradient(160deg,#0b3a6f 0%,#1167a8 45%,#1d9e9e 100%);} /* 海岛/海滨/潜水 */
+.theme-sunset{background:linear-gradient(160deg,#6e2545 0%,#c0432f 50%,#e7972a 100%);} /* 城市夜景/浪漫/沙漠日落 */
+.theme-forest{background:linear-gradient(160deg,#123421 0%,#1f6e4e 50%,#3f8a3a 100%);} /* 雨林/山野/徒步/茶园 */
+.theme-city  {background:linear-gradient(160deg,#232a45 0%,#34407a 50%,#4d6fae 100%);} /* 都市/购物/现代建筑 */
+.theme-sakura{background:linear-gradient(160deg,#8a3a6b 0%,#b65a86 45%,#7b6fd0 100%);} /* 日本/赏花/春季粉调 */
+.theme-snow  {background:linear-gradient(160deg,#243b63 0%,#3f6fb0 55%,#86b6e6 100%);} /* 滑雪/雪国/冬季 */
+.theme-desert{background:linear-gradient(160deg,#5e3417 0%,#b5762f 52%,#dcab53 100%);} /* 沙漠/戈壁/丝路 */
 
+/* Decorative overlays (optional, theme-flavoured). Add e.g. class="header theme-night deco-stars". */
 .deco-stars::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0.85;
   background-image:
     radial-gradient(1.4px 1.4px at 12% 22%,#fff 50%,transparent),
@@ -89,6 +106,7 @@ table::-webkit-scrollbar-button{display:none;width:0;height:0;}
     radial-gradient(1.2px 1.2px at 88% 52%,#fff 50%,transparent),
     radial-gradient(1.3px 1.3px at 38% 82%,#fff 50%,transparent),
     radial-gradient(1.1px 1.1px at 70% 40%,#fff 50%,transparent);}
+/* soft light blobs — good for ocean/sunset/sakura warmth */
 .deco-glow::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0.5;
   background:radial-gradient(40% 60% at 80% 12%,rgba(255,255,255,0.35),transparent 70%),
             radial-gradient(46% 64% at 14% 90%,rgba(255,255,255,0.18),transparent 70%);}
@@ -108,7 +126,7 @@ table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 .toc-l2 a:hover{background:var(--bg3);text-decoration:none;}
 .toc-l2 a .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:0.7;}
 
-/* Section */
+/* Section (= one day, or a top-level block like 概览 / 预算 / 清单) */
 .section{margin-bottom:60px;}
 .section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:2.5px solid var(--border);}
 .section-num{min-width:36px;height:36px;padding:0 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
@@ -127,10 +145,11 @@ table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 .card ul,.card ol{padding-left:22px;margin-bottom:10px;}
 .card li{margin-bottom:6px;line-height:1.8;font-size:14px;}
 
+/* Highlight box — for the trip overview / a key fact (replaces study-notes' .fbox) */
 .highlight-box{background:var(--bg3);border-left:3.5px solid var(--blue);border-radius:0 10px 10px 0;padding:16px 20px;margin:14px 0;}
 .highlight-box .hl-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:8px;opacity:0.75;}
 
-/* Callouts */
+/* Callouts — base CSS kept from study-notes; classes retargeted to travel use */
 .callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:13px;}
 .callout-icon{font-size:15px;flex-shrink:0;margin-top:3px;line-height:1;}
 .callout-body{flex:1;}
@@ -138,6 +157,9 @@ table::-webkit-scrollbar-button{display:none;width:0;height:0;}
 .callout-body p strong,.callout-body li strong{display:inline;font-size:inherit;font-weight:700;}
 .callout-body p,.callout-body li{font-size:14px;margin:0 0 4px;line-height:1.7;}
 .callout-body ul{padding-left:18px;margin:0;}
+/* Travel callout semantics:
+   info=blue💡 须知/一般信息 | tip=teal✦ 省钱省时小技巧 | warn=amber⚠ 注意(排队/天气/治安)
+   must=red★ 必订/必约/需提前预订 | avoid=pink✗ 避雷/不推荐 | weather=purple🌧 雨天/极端天气 Plan B */
 .info{background:var(--blue-light);border:1px solid rgba(24,95,165,0.18);}
 .info .callout-icon::before{content:"💡";}
 .tip{background:var(--teal-light);border:1px solid rgba(15,110,86,0.18);}
@@ -170,7 +192,7 @@ details[open] summary::before{transform:rotate(90deg);}
 .details-body{padding:18px 20px;}
 .details-body p{margin-bottom:8px;font-size:14px;}
 
-/* Numbered steps */
+/* Numbered steps (e.g. 如何前往 / 换乘指引) */
 .steps{margin:8px 0;}
 .step{display:flex;gap:14px;margin-bottom:16px;}
 .step-num{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
@@ -178,7 +200,9 @@ details[open] summary::before{transform:rotate(90deg);}
 .step-body > strong{display:block;margin-bottom:4px;}
 .step-body p strong,.step-body li strong{display:inline;font-weight:700;}
 
-/* ── POI card ── */
+/* ── POI (point-of-interest) card ── one stop in a day's timeline.
+   Lives inside a day section as <div class="card poi sec-aware">. The left color bar
+   comes from the enclosing .sec-COLOR via the accent rules further down. */
 .poi{position:relative;border-left:4px solid var(--border);}
 .poi .poi-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px;
   padding-bottom:0;border-bottom:none;}
@@ -193,19 +217,20 @@ details[open] summary::before{transform:rotate(90deg);}
   border-radius:7px;padding:8px 12px;margin-top:8px;line-height:1.6;}
 .poi .poi-tip::before{content:"💬 ";opacity:0.8;}
 
-/* Day overview strip */
+/* Day overview strip (under the day section header): 当日花费 + 步数 + 主要点数 */
 .day-meta{display:flex;flex-wrap:wrap;gap:8px;margin:-8px 0 18px;}
 .day-meta .meta-chip{background:var(--bg2);}
 .day-meta .spend{background:var(--green-light);border-color:rgba(59,109,17,0.3);color:var(--green-dark);}
 
-/* ── Transit connector ── */
+/* ── Transit connector ── sits BETWEEN two POI cards = 到下一点的通勤/路线段.
+   Mirrors the day's route on the map: mode + distance + time. */
 .transit{display:flex;justify-content:center;align-items:center;gap:8px;margin:-4px 0 12px;
   font-size:12.5px;color:var(--text2);}
 .transit .tpill{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);
   border:1px solid var(--border);border-radius:20px;padding:3px 12px;font-weight:600;white-space:nowrap;}
 .transit .tarrow{color:var(--text3);font-size:13px;}
 
-/* ── Transport segment card ── */
+/* ── Transport segment card (flight / train / intercity) ── */
 .transport{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);
   border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;}
 .transport .tr-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
@@ -225,7 +250,7 @@ details[open] summary::before{transform:rotate(90deg);}
   border:1px solid rgba(24,95,165,0.25);border-radius:7px;padding:5px 12px;transition:filter .12s;}
 .btn-link:hover{filter:brightness(0.96);}
 
-/* ── Multi-platform price comparison ── */
+/* ── Multi-platform price comparison (机票必做：查多个平台比价) ── inside a flight .transport card */
 .price-compare{margin-top:11px;border-top:1px dashed var(--border);padding-top:9px;}
 .price-compare .pc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
   color:var(--text3);margin-bottom:6px;}
@@ -236,7 +261,9 @@ details[open] summary::before{transform:rotate(90deg);}
 .pc-row.cheapest .pc-price{color:var(--green-dark);}
 .pc-row.cheapest .pc-plat::after{content:" ✓ 最低";font-size:11px;font-weight:700;color:var(--green-dark);}
 
-/* ── Hotel option card ── */
+/* ── Hotel option card (住宿备选) ── group ≥3 .hotel blocks inside one .card (h3 = 住宿备选).
+   If the user already has accommodation, replace with ONE 已订住宿 card and put
+   data-hotels="user-booked" on that .card so check_html.py knows the omission is deliberate. */
 .hotel{border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin:12px 0;background:var(--bg);}
 .hotel:first-of-type{margin-top:4px;}
 .hotel .h-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px;}
@@ -247,6 +274,7 @@ details[open] summary::before{transform:rotate(90deg);}
   background:var(--teal-light);color:var(--teal-dark);border:1px solid rgba(15,110,86,0.25);
   border-radius:5px;padding:1px 8px;}
 .hotel .h-meta{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+/* 评论体检 — the "we read the reviews, not the blurb" box */
 .review-check{font-size:12.5px;line-height:1.65;background:var(--bg2);border:1px solid var(--border);
   border-radius:7px;padding:9px 12px;margin:8px 0;}
 .review-check .rc-title{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;
@@ -257,7 +285,7 @@ details[open] summary::before{transform:rotate(90deg);}
 .rank-tag.rec{background:var(--green-light);color:var(--green-dark);}
 .rank-tag.alt{background:var(--bg3);color:var(--text2);}
 
-/* ── Checklist ── */
+/* ── Pre-departure / packing checklist ── */
 .checklist{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:16px;}
 .checklist label{display:flex;align-items:flex-start;gap:10px;padding:7px 4px;font-size:14px;
   cursor:pointer;border-bottom:1px solid var(--border);line-height:1.6;}
@@ -274,6 +302,7 @@ details[open] summary::before{transform:rotate(90deg);}
 .map-legend{display:flex;flex-wrap:wrap;gap:14px;padding:10px 16px;border-top:1px solid var(--border);}
 .leg-item{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text2);}
 .leg-dot{width:13px;height:13px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0;}
+/* Leaflet numbered pin (built via divIcon in JS) */
 .pin{width:24px;height:24px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;
   display:flex;align-items:center;justify-content:center;border:2px solid #fff;
   box-shadow:0 1px 4px rgba(0,0,0,.45);}
@@ -293,7 +322,9 @@ details[open] summary::before{transform:rotate(90deg);}
 .b-green{background:var(--green-light);color:var(--green-dark);}
 .b-red{background:var(--red-light);color:var(--red-dark);}
 
-/* ── Chips ── */
+/* ── Chips ── reusable pill for wrapping short items anywhere in the body
+   (必吃清单、亮点、随手鸟点/物种、关键词…). Wrap a run of them; they flow + wrap.
+   .star = 招牌/必看 (amber highlight); .muted = 机会/备选 (dashed, dimmed). */
 .chips{display:flex;flex-wrap:wrap;gap:6px 7px;margin:8px 0;}
 .chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);
   border-radius:20px;padding:3px 11px;font-size:12px;font-weight:600;color:var(--text2);
@@ -301,7 +332,7 @@ details[open] summary::before{transform:rotate(90deg);}
 .chip.star{background:var(--amber-light);border-color:rgba(186,117,23,0.3);color:var(--amber-dark);}
 .chip.muted{opacity:0.72;border-style:dashed;font-weight:500;}
 
-/* Section color accents */
+/* Section color accents — apply to the wrapper, e.g. <div class="sec-teal"> */
 .sec-purple .section-num{background:var(--purple-light);color:var(--purple-dark);}
 .sec-purple .section h2{color:var(--purple-dark);}
 .sec-purple .poi{border-left-color:var(--purple);}
@@ -360,6 +391,106 @@ details[open] summary::before{transform:rotate(90deg);}
   transition:background 0.1s;
 }
 #nav-panel a:hover{background:var(--bg2);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   方向层 —— 写在 <html data-theme="journal|magazine">，省略 = 旧版暖米白。
+
+   ⚠ 与另外两个 skill 的关键差别：这里**不做单色分区**。
+   行程的分区色是按天轮转的（Day1 紫 → Day2 青 → …），那是跨天的寻路线索，
+   还和地图上的路线颜色对应 —— 压成单色会把这条线索毁掉。
+   所以方向只把整套色**重新调色**（统一到该方向的色温），七天七色照旧。
+
+   另：hero 的 theme-night/ocean/sakura… 管「目的地气质」，data-theme 管
+   「文档用途」，两个轴互不干扰，可以自由组合（实测渐变在各方向下都完好）。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 旅行手账 journal（默认）｜衬线正文、取消卡片、零圆角｜慢旅行、想留作纪念 ── */
+[data-theme="journal"]{
+  --bg:#FCFBF8; --bg2:#F6F3ED; --bg3:#F1EDE4; --bg4:#E9E3D6;
+  --text:#1B1815; --text2:#5C554C; --text3:#746D64;
+  --border:rgba(27,24,21,.17);
+  --radius:0px;
+  --blue:#2B4A6B;  --blue-light:#E8EDF2;  --blue-dark:#1A3350;  --blue-mid:#4A7099;
+  --teal:#3F5A44;  --teal-light:#E8EEE8;  --teal-dark:#2A3F2E;  --teal-mid:#5C7F62;
+  --amber:#8A6410; --amber-light:#F5EDDB; --amber-dark:#5F4408; --amber-mid:#C89422;
+  --red:#7C2A22;   --red-light:#F4E9E7;   --red-dark:#5C1D17;
+  --pink:#7A3550;  --pink-light:#F4E9ED;
+  --green:#3B5E40; --green-light:#E7EEE7; --green-dark:#264229; --green-mid:#57814E;
+  --purple:#4A3F63;--purple-light:#EDEAF2;--purple-dark:#332A48;--purple-mid:#726399;
+  --coral:#8A4A2A; --coral-light:#F5EAE3; --coral-dark:#5F311A; --coral-mid:#B5714A;
+}
+[data-theme="journal"] body,
+[data-theme="journal"] .card p,
+[data-theme="journal"] .poi p{font-family:"Noto Serif SC","Sitka Text",Constantia,Georgia,"华文宋体",serif;}
+[data-theme="journal"] .page{max-width:780px;}
+/* 取消卡片：内容直接落页面，发丝线分隔 —— 像一本翻旧的笔记本 */
+[data-theme="journal"] .card{background:transparent;border:0;border-bottom:1px solid var(--border);
+  border-radius:0;padding:0 0 20px;margin-bottom:20px;}
+[data-theme="journal"] .card:last-child{border-bottom:0;}
+[data-theme="journal"] .card h3{border-bottom:0;}
+[data-theme="journal"] .section-num{border-radius:0;background:transparent;
+  border:1px solid var(--border);color:var(--text2);}
+[data-theme="journal"] .transport,[data-theme="journal"] .checklist,
+[data-theme="journal"] .chip,[data-theme="journal"] .meta-chip{border-radius:0;}
+
+/* ── 旅行杂志 magazine｜大号衬线标题、留白、一支洋红｜发给别人看的、种草贴 ── */
+[data-theme="magazine"]{
+  --bg:#FFFFFF; --bg2:#F7F6F4; --bg3:#EFEDE9; --bg4:#E4E1DC;
+  --text:#0B0B0C; --text2:#54524F; --text3:#716E6B;
+  --border:rgba(0,0,0,.12);
+  --radius:8px;
+  --blue:#1B4F8F;  --blue-light:#E7EFF8;  --blue-dark:#0F3567;  --blue-mid:#3F7CC4;
+  --teal:#1D5C4A;  --teal-light:#E3F0EB;  --teal-dark:#124034;  --teal-mid:#2E8A6D;
+  --amber:#9A6A0F; --amber-light:#F7EFDC; --amber-dark:#6B4A08; --amber-mid:#D19A22;
+  --red:#C2185B;   --red-light:#FBE9F0;   --red-dark:#8E1042;
+  --pink:#9A2B55;  --pink-light:#FAE8EE;
+  --green:#356515; --green-light:#EAF2E1; --green-dark:#22470A; --green-mid:#5A9128;
+  --purple:#4A31A8;--purple-light:#EDE9FA;--purple-dark:#33207A;--purple-mid:#7A63D6;
+  --coral:#C2185B; --coral-light:#FBE9F0; --coral-dark:#8E1042; --coral-mid:#E0457E;
+}
+[data-theme="magazine"] .header h1{font-family:"Noto Serif SC",Georgia,serif;
+  font-size:44px;font-weight:900;line-height:1.1;}
+[data-theme="magazine"] .section h2{font-family:"Noto Serif SC",Georgia,serif;
+  font-size:30px;font-weight:900;line-height:1.22;}
+[data-theme="magazine"] .card h3,
+[data-theme="magazine"] .poi-head h3{font-family:"Noto Serif SC",Georgia,serif;font-size:21px;}
+[data-theme="magazine"] .page{max-width:860px;}
+[data-theme="magazine"] .section{margin-bottom:64px;}
+[data-theme="magazine"] .card{box-shadow:0 1px 3px rgba(0,0,0,.06);}
+
+/* ══ 各方向的深色版本 ══
+   ⚠ 必须写在方向块之后：@media 不提升特异性，:root 与 [data-theme=x] 同为 (0,1,0)，
+     同分比先后。放前面会被静默吃掉 —— 表现为深色模式下方向全停在白底。 */
+@media(prefers-color-scheme:dark){
+  [data-theme="journal"]{
+    --bg:#18160F; --bg2:#201D16; --bg3:#28241C; --bg4:#302B21;
+    --text:#EDE7DA; --text2:#A9A08E; --text3:#908571;
+    --border:rgba(237,231,218,.19);
+    --blue:#7FA8CC;  --blue-light:#1B2A38;  --blue-dark:#B4CFE6;  --blue-mid:#6289AB;
+    --teal:#89B08F;  --teal-light:#1D2C1F;  --teal-dark:#B2CFB6;  --teal-mid:#6D9474;
+    --amber:#D9A63A; --amber-light:#33260A; --amber-dark:#EDC97D; --amber-mid:#BE8E28;
+    --red:#E08B7E;   --red-light:#3B1B15;   --red-dark:#F1B4A8;
+    --pink:#CE8AA2;  --pink-light:#33202A;
+    --green:#93BE99; --green-light:#1E2F20; --green-dark:#BBD6BF; --green-mid:#74A07B;
+    --purple:#A79BC9;--purple-light:#2A2338;--purple-dark:#C7BFE0;--purple-mid:#8B7DB4;
+    --coral:#D69068; --coral-light:#3A2413; --coral-dark:#EBB795; --coral-mid:#B8794F;
+  }
+  [data-theme="magazine"]{
+    --bg:#0B0B0C; --bg2:#151517; --bg3:#1D1D20; --bg4:#26262A;
+    --text:#F2F1EF; --text2:#A2A09C; --text3:#82807B;
+    --border:rgba(255,255,255,.15);
+    --blue:#6BA3E8;  --blue-light:#12263D;  --blue-dark:#A6CBF2;  --blue-mid:#4A83C9;
+    --teal:#43AC8E;  --teal-light:#0D2C24;  --teal-dark:#7BD2B4;  --teal-mid:#31967A;
+    --amber:#DDA733; --amber-light:#33270A; --amber-dark:#EFCA74; --amber-mid:#C29024;
+    --red:#F06292;   --red-light:#3D1224;   --red-dark:#F8A5C2;
+    --pink:#E089A8;  --pink-light:#3D1A28;
+    --green:#90C258; --green-light:#1E2F11; --green-dark:#B5DC89; --green-mid:#76A644;
+    --purple:#9C8FF0;--purple-light:#231C57;--purple-dark:#C4BBF7;--purple-mid:#7E70DC;
+    --coral:#F06292; --coral-light:#3D1224; --coral-dark:#F8A5C2; --coral-mid:#E8508A;
+  }
+  [data-theme="magazine"] .card{background:#141416;}
+}
+
 #nav-panel .nav-title{
   font-size:10px;font-weight:700;color:var(--text3);
   text-transform:uppercase;letter-spacing:0.08em;
