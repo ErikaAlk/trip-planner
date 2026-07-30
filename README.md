@@ -155,6 +155,7 @@ python3 scripts/check_html.py <输出>.html      # macOS/Linux
   - **两个轴，不是一个**：`theme-*` 管目的地气质，`data-theme` 管文档用途，自由组合。实测六种组合下 hero 渐变全部完好。
   - **刻意不做单色分区**（这是与 `study-notes` / `visual-report` 的关键差别）：行程的每日色轮转是**跨天的寻路线索**，还和地图上的路线颜色一一对应，压成单色会把这条线索毁掉。方向只把整套色**重新调色**统一到该方向的色温，**七天七色照旧**——已实测每个方向下每日色数都是 7。
   - **顺带修掉一个既有缺陷**：`--text3` 在 `--bg2` 卡片上**只有 3.21:1**（深色 3.01:1），低于 AA，而目录标题、地图说明、比价标题、换乘箭头都吃它。这是三个同源 skill 上的同一个 bug，`visual-report` 与 `study-notes` 已先后修掉，这边补齐；示例 `examples/成都4日游行程.html` 的内嵌 CSS 一并同步。
+  - **示例与 README 全部资产一并翻新**：示例内嵌的也是旧 CSS 快照，加了 `data-theme` 也是空转。改成按模板组装出完整样式表整块替换，示例 `<html>` 设为 `data-theme="journal"`。**注意：`## Full CSS` 不是全部** —— 必需的 640px 移动端块挂在 HTML 模板的 `<style>` 里、在占位符之后，只取 Full CSS 会把它丢掉（`check_html.py` 的 mobile adaptation 直接 FAIL，实测踩到）。资产用 `make_showcase.sh` + `make_hero.py` + `make_demo_gif.py` 重出六张；`timeline-desktop.png` / `hotels-desktop.png` 的裁剪窗口不靠目测，改用浏览器实测的区块 `getBoundingClientRect` 坐标。
   - **实测**：从改后的 `design-system.md` 抽出 CSS ＋模板拼成真实行程页（hero、航班比价、时刻节点、POI 卡、换乘连接、预算表、行前清单全覆盖），**3 方向 × 明暗 2 模式 = 6 组合**，逐元素按真实计算样式 ＋ 逐层向上解析有效背景做 WCAG 扫描：**0 处未达标**（改动前 base 一栏有 6 处），横向溢出 0，无 JS 报错；`check_html.py` 对示例 `all checks passed`。
 
 - **2026-06-20 · v0.18** — 生态对标:评估了 [anysearch-skill](https://github.com/anysearch-ai/anysearch-skill)(给 agent 用的统一搜索 API)能否进工作流,结论**不纳入**——它只能改进契约里已被降级的 web_search 层、碰不到三类强制浏览器数据(机票/酒店实时价、真实评论区),且中国主战场(携程/飞猪/高德/12306/小红书)零具名覆盖、供应商发布仅 6 周创始人匿名。完整「症状→理由→未来复评的唯一窄口子(燃油/官方静态页 extract)+六道门槛」记进 `references/lessons-learned.md` 新增的「对标观察登记册」B1。**本轮不改任何运行行为**,纯留对标记忆。
