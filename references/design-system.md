@@ -59,7 +59,9 @@ Copy the CSS block and the HTML/JS template **verbatim**, then fill in the conte
 ```css
 :root {
   --bg:#ffffff; --bg2:#f7f6f2; --bg3:#f0ede6; --bg4:#e8e4db;
-  --text:#1a1a18; --text2:#5a5a56; --text3:#8a8a84;
+  /* text3 由 #8a8a84 调深：旧值在 --bg2 卡片上只有 3.21:1，低于 AA。目录标题、地图说明、
+     比价标题、换乘箭头都吃它。保持色相只调明度解得。 */
+  --text:#1a1a18; --text2:#5a5a56; --text3:#70706B;
   --border:rgba(0,0,0,0.11);
   --purple:#534AB7; --purple-light:#EEEDFE; --purple-dark:#3C3489; --purple-mid:#7F77DD;
   --teal:#0F6E56;   --teal-light:#E1F5EE;   --teal-dark:#085041;   --teal-mid:#1D9E75;
@@ -74,7 +76,7 @@ Copy the CSS block and the HTML/JS template **verbatim**, then fill in the conte
 @media(prefers-color-scheme:dark){
   :root{
     --bg:#1e1e1c; --bg2:#252523; --bg3:#2c2c2a; --bg4:#333330;
-    --text:#e8e6de; --text2:#a8a69e; --text3:#706e68;
+    --text:#e8e6de; --text2:#a8a69e; --text3:#8F8D85;
     --border:rgba(255,255,255,0.1);
     --purple-light:#26215C; --teal-light:#04342C; --coral-light:#4A1B0C;
     --amber-light:#412402; --blue-light:#042C53; --green-light:#173404;
@@ -435,6 +437,106 @@ details[open] summary::before{transform:rotate(90deg);}
   transition:background 0.1s;
 }
 #nav-panel a:hover{background:var(--bg2);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   方向层 —— 写在 <html data-theme="journal|magazine">，省略 = 旧版暖米白。
+
+   ⚠ 与另外两个 skill 的关键差别：这里**不做单色分区**。
+   行程的分区色是按天轮转的（Day1 紫 → Day2 青 → …），那是跨天的寻路线索，
+   还和地图上的路线颜色对应 —— 压成单色会把这条线索毁掉。
+   所以方向只把整套色**重新调色**（统一到该方向的色温），七天七色照旧。
+
+   另：hero 的 theme-night/ocean/sakura… 管「目的地气质」，data-theme 管
+   「文档用途」，两个轴互不干扰，可以自由组合（实测渐变在各方向下都完好）。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 旅行手账 journal（默认）｜衬线正文、取消卡片、零圆角｜慢旅行、想留作纪念 ── */
+[data-theme="journal"]{
+  --bg:#FCFBF8; --bg2:#F6F3ED; --bg3:#F1EDE4; --bg4:#E9E3D6;
+  --text:#1B1815; --text2:#5C554C; --text3:#746D64;
+  --border:rgba(27,24,21,.17);
+  --radius:0px;
+  --blue:#2B4A6B;  --blue-light:#E8EDF2;  --blue-dark:#1A3350;  --blue-mid:#4A7099;
+  --teal:#3F5A44;  --teal-light:#E8EEE8;  --teal-dark:#2A3F2E;  --teal-mid:#5C7F62;
+  --amber:#8A6410; --amber-light:#F5EDDB; --amber-dark:#5F4408; --amber-mid:#C89422;
+  --red:#7C2A22;   --red-light:#F4E9E7;   --red-dark:#5C1D17;
+  --pink:#7A3550;  --pink-light:#F4E9ED;
+  --green:#3B5E40; --green-light:#E7EEE7; --green-dark:#264229; --green-mid:#57814E;
+  --purple:#4A3F63;--purple-light:#EDEAF2;--purple-dark:#332A48;--purple-mid:#726399;
+  --coral:#8A4A2A; --coral-light:#F5EAE3; --coral-dark:#5F311A; --coral-mid:#B5714A;
+}
+[data-theme="journal"] body,
+[data-theme="journal"] .card p,
+[data-theme="journal"] .poi p{font-family:"Noto Serif SC","Sitka Text",Constantia,Georgia,"华文宋体",serif;}
+[data-theme="journal"] .page{max-width:780px;}
+/* 取消卡片：内容直接落页面，发丝线分隔 —— 像一本翻旧的笔记本 */
+[data-theme="journal"] .card{background:transparent;border:0;border-bottom:1px solid var(--border);
+  border-radius:0;padding:0 0 20px;margin-bottom:20px;}
+[data-theme="journal"] .card:last-child{border-bottom:0;}
+[data-theme="journal"] .card h3{border-bottom:0;}
+[data-theme="journal"] .section-num{border-radius:0;background:transparent;
+  border:1px solid var(--border);color:var(--text2);}
+[data-theme="journal"] .transport,[data-theme="journal"] .checklist,
+[data-theme="journal"] .chip,[data-theme="journal"] .meta-chip{border-radius:0;}
+
+/* ── 旅行杂志 magazine｜大号衬线标题、留白、一支洋红｜发给别人看的、种草贴 ── */
+[data-theme="magazine"]{
+  --bg:#FFFFFF; --bg2:#F7F6F4; --bg3:#EFEDE9; --bg4:#E4E1DC;
+  --text:#0B0B0C; --text2:#54524F; --text3:#716E6B;
+  --border:rgba(0,0,0,.12);
+  --radius:8px;
+  --blue:#1B4F8F;  --blue-light:#E7EFF8;  --blue-dark:#0F3567;  --blue-mid:#3F7CC4;
+  --teal:#1D5C4A;  --teal-light:#E3F0EB;  --teal-dark:#124034;  --teal-mid:#2E8A6D;
+  --amber:#9A6A0F; --amber-light:#F7EFDC; --amber-dark:#6B4A08; --amber-mid:#D19A22;
+  --red:#C2185B;   --red-light:#FBE9F0;   --red-dark:#8E1042;
+  --pink:#9A2B55;  --pink-light:#FAE8EE;
+  --green:#356515; --green-light:#EAF2E1; --green-dark:#22470A; --green-mid:#5A9128;
+  --purple:#4A31A8;--purple-light:#EDE9FA;--purple-dark:#33207A;--purple-mid:#7A63D6;
+  --coral:#C2185B; --coral-light:#FBE9F0; --coral-dark:#8E1042; --coral-mid:#E0457E;
+}
+[data-theme="magazine"] .header h1{font-family:"Noto Serif SC",Georgia,serif;
+  font-size:44px;font-weight:900;line-height:1.1;}
+[data-theme="magazine"] .section h2{font-family:"Noto Serif SC",Georgia,serif;
+  font-size:30px;font-weight:900;line-height:1.22;}
+[data-theme="magazine"] .card h3,
+[data-theme="magazine"] .poi-head h3{font-family:"Noto Serif SC",Georgia,serif;font-size:21px;}
+[data-theme="magazine"] .page{max-width:860px;}
+[data-theme="magazine"] .section{margin-bottom:64px;}
+[data-theme="magazine"] .card{box-shadow:0 1px 3px rgba(0,0,0,.06);}
+
+/* ══ 各方向的深色版本 ══
+   ⚠ 必须写在方向块之后：@media 不提升特异性，:root 与 [data-theme=x] 同为 (0,1,0)，
+     同分比先后。放前面会被静默吃掉 —— 表现为深色模式下方向全停在白底。 */
+@media(prefers-color-scheme:dark){
+  [data-theme="journal"]{
+    --bg:#18160F; --bg2:#201D16; --bg3:#28241C; --bg4:#302B21;
+    --text:#EDE7DA; --text2:#A9A08E; --text3:#908571;
+    --border:rgba(237,231,218,.19);
+    --blue:#7FA8CC;  --blue-light:#1B2A38;  --blue-dark:#B4CFE6;  --blue-mid:#6289AB;
+    --teal:#89B08F;  --teal-light:#1D2C1F;  --teal-dark:#B2CFB6;  --teal-mid:#6D9474;
+    --amber:#D9A63A; --amber-light:#33260A; --amber-dark:#EDC97D; --amber-mid:#BE8E28;
+    --red:#E08B7E;   --red-light:#3B1B15;   --red-dark:#F1B4A8;
+    --pink:#CE8AA2;  --pink-light:#33202A;
+    --green:#93BE99; --green-light:#1E2F20; --green-dark:#BBD6BF; --green-mid:#74A07B;
+    --purple:#A79BC9;--purple-light:#2A2338;--purple-dark:#C7BFE0;--purple-mid:#8B7DB4;
+    --coral:#D69068; --coral-light:#3A2413; --coral-dark:#EBB795; --coral-mid:#B8794F;
+  }
+  [data-theme="magazine"]{
+    --bg:#0B0B0C; --bg2:#151517; --bg3:#1D1D20; --bg4:#26262A;
+    --text:#F2F1EF; --text2:#A2A09C; --text3:#82807B;
+    --border:rgba(255,255,255,.15);
+    --blue:#6BA3E8;  --blue-light:#12263D;  --blue-dark:#A6CBF2;  --blue-mid:#4A83C9;
+    --teal:#43AC8E;  --teal-light:#0D2C24;  --teal-dark:#7BD2B4;  --teal-mid:#31967A;
+    --amber:#DDA733; --amber-light:#33270A; --amber-dark:#EFCA74; --amber-mid:#C29024;
+    --red:#F06292;   --red-light:#3D1224;   --red-dark:#F8A5C2;
+    --pink:#E089A8;  --pink-light:#3D1A28;
+    --green:#90C258; --green-light:#1E2F11; --green-dark:#B5DC89; --green-mid:#76A644;
+    --purple:#9C8FF0;--purple-light:#231C57;--purple-dark:#C4BBF7;--purple-mid:#7E70DC;
+    --coral:#F06292; --coral-light:#3D1224; --coral-dark:#F8A5C2; --coral-mid:#E8508A;
+  }
+  [data-theme="magazine"] .card{background:#141416;}
+}
+
 #nav-panel .nav-title{
   font-size:10px;font-weight:700;color:var(--text3);
   text-transform:uppercase;letter-spacing:0.08em;
@@ -451,7 +553,10 @@ Fill in the `TRIP` JS object (map data), the TOC, and the day sections. Keep the
 
 ```html
 <!DOCTYPE html>
-<html lang="zh-CN">
+<!-- data-theme 决定正文观感；省略 = 旧版暖米白。选哪套见「Section Color Assignment」。
+     journal=旅行手账(衬线正文,推荐默认) / magazine=旅行杂志(大标题,发给别人看的)
+     注意：这与 hero 的 theme-* 是两个轴 —— theme-* 管目的地气质，data-theme 管文档用途。 -->
+<html lang="zh-CN" data-theme="journal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1214,7 +1319,25 @@ map. Full vetting method: `references/research-playbook.md` §2.5.
 | `avoid` | ✗ | **避雷 / 不推荐 / 宰客**——具体说明为什么 |
 | `weather` | 🌧 | 雨天或极端天气的室内 **Plan B** |
 
-## Section Color Assignment
+## Direction & Section Color Assignment
+
+### 先选方向（`<html data-theme="…">`）
+
+`data-theme` 管**正文观感**，hero 的 `theme-*` 管**目的地气质** —— 两个轴独立，自由组合。
+
+| `data-theme` | 承诺 | 用于 |
+|---|---|---|
+| `journal` **（默认）** | 思源宋体正文；**取消卡片**改发丝线；零圆角（chip 也是方的，像贴纸）；780px 窄版心 | 慢旅行、休闲游、想留作纪念的行程 |
+| `magazine` | 思源宋体 Black 大标题（h1 44 / h2 30 / h3 21）；分区间距 64px；一支洋红 #C2185B；卡片带浅投影 | 发给别人看的行程、种草贴、纪念页 |
+| 省略 | 旧版暖米白 | 兼容既有行程 |
+
+各配深色版。
+
+**这里刻意不做单色分区**（与 `study-notes` / `visual-report` 不同）：行程的每日色轮转是
+跨天的寻路线索，还和地图上的路线颜色对应，压成单色会把线索毁掉。方向只把整套色重新
+调色统一到该方向的色温，**七天七色照旧**。
+
+### 再排每日色
 
 Cycle day colors in order so adjacent days are visually distinct and match their map routes:
 `Day1 purple → Day2 teal → Day3 coral → Day4 amber → Day5 blue → Day6 green → Day7 red`
