@@ -689,19 +689,24 @@ def build_parser():
         description="腾讯位置服务 · trip-planner 取真实坐标/车程/票价",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="坐标默认输出 WGS-84（Leaflet/OSM 用）。腾讯原生是 GCJ-02，"
-               "直接填进 Leaflet 会偏约 500 米。")
-    p.add_argument("--key", help="API Key（默认读环境变量或 ~/.claude/.tencent-lbs-key）")
-    p.add_argument("--json", action="store_true", help="输出 JSON，便于直接填进 TRIP 数据")
+               "直接填进 Leaflet 会偏约 500 米。\n"
+               "--key / --json 写在子命令后面，例：geocode 宽窄巷子 --city 成都 --json")
+    # Shared options live on the SUBCOMMANDS, not the top level: putting them
+    # in both makes argparse's subparser defaults clobber a top-level value,
+    # so `--json geocode ...` would silently do nothing.
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--key", help="API Key（默认读环境变量或 ~/.claude/.tencent-lbs-key）")
+    common.add_argument("--json", action="store_true", help="输出 JSON，便于直接填进 TRIP 数据")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    g = sub.add_parser("geocode", help="地点名 → 坐标（带相关性校验）")
+    g = sub.add_parser("geocode", parents=[common], help="地点名 → 坐标（带相关性校验）")
     g.add_argument("names", nargs="*", help="一个或多个地点名")
     g.add_argument("--file", help="从文件读，一行一个")
     g.add_argument("--city", help="限定城市（必需：腾讯搜索要求搜索范围）")
     g.add_argument("--coord", choices=("wgs84", "gcj02"), default="wgs84")
     g.set_defaults(func=cmd_geocode)
 
-    r = sub.add_parser("route", help="两点间路线：距离/时长/票价/过路费")
+    r = sub.add_parser("route", parents=[common], help="两点间路线：距离/时长/票价/过路费")
     r.add_argument("--from", dest="origin", required=True, help="地点名或 lat,lng（WGS-84）")
     r.add_argument("--to", dest="dest", required=True)
     r.add_argument("--city")
@@ -709,14 +714,14 @@ def build_parser():
     r.add_argument("--limit", type=int, default=3, help="最多显示几个方案")
     r.set_defaults(func=cmd_route)
 
-    m = sub.add_parser("matrix", help="多点距离矩阵，用于地理聚类")
+    m = sub.add_parser("matrix", parents=[common], help="多点距离矩阵，用于地理聚类")
     m.add_argument("names", nargs="*")
     m.add_argument("--file")
     m.add_argument("--city")
     m.add_argument("--mode", choices=("driving", "walking", "bicycling"), default="driving")
     m.set_defaults(func=cmd_matrix)
 
-    s = sub.add_parser("search", help="周边/关键词搜索：找餐厅、地铁站、酒店")
+    s = sub.add_parser("search", parents=[common], help="周边/关键词搜索：找餐厅、地铁站、酒店")
     s.add_argument("keyword")
     s.add_argument("--city")
     s.add_argument("--near", help="中心点 lat,lng（WGS-84）")
@@ -725,7 +730,7 @@ def build_parser():
     s.add_argument("--coord", choices=("wgs84", "gcj02"), default="wgs84")
     s.set_defaults(func=cmd_search)
 
-    c = sub.add_parser("selfcheck", help="连通性 + 额度 + 误报防护自检")
+    c = sub.add_parser("selfcheck", parents=[common], help="连通性 + 额度 + 误报防护自检")
     c.set_defaults(func=cmd_selfcheck)
     return p
 
