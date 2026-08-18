@@ -235,6 +235,30 @@ class TestThrottle(unittest.TestCase):
         self.assertGreaterEqual(T._MATRIX_PAUSE, 1.0)
 
 
+class TestCityRequirement(unittest.TestCase):
+    """`--city` 不是可选的，但只对地名输入而言。
+
+    实测：不带 boundary 直接 348；带 region(中国,0) 返回 status 0 却是空结果。
+    两种都对使用者没意义，所以命令入口要拦住并给出可操作提示。
+    """
+
+    def test_coordinate_pairs_are_recognised(self):
+        """给了坐标就不需要城市，不该被拦下。"""
+        for text in ["30.66,104.06", "30.666274,104.051164", "-33.87,151.20", "0,0"]:
+            self.assertTrue(T._looks_like_coords(text), text)
+
+    def test_place_names_are_not_coordinates(self):
+        for text in ["宽窄巷子", "成都,武侯祠", "30.66", "", "a,b", "30.66,104.06,7"]:
+            self.assertFalse(T._looks_like_coords(text), text)
+
+    def test_hint_names_the_missing_flag_and_shows_a_command(self):
+        """提示必须能照着做，而不是复述腾讯的报错。"""
+        hint = T._NEED_CITY.format("geocode 宽窄巷子")
+        self.assertIn("--city", hint)
+        self.assertIn("成都", hint)
+        self.assertNotIn("348", hint)
+
+
 class TestErrorHints(unittest.TestCase):
     def test_rate_limit_codes_are_retryable(self):
         self.assertIn(120, T._RATE_LIMITED)

@@ -314,6 +314,25 @@ def _pad(text, cells, right=False):
     return gap + text if right else text + gap
 
 
+_NEED_CITY = (
+    "缺 --city。腾讯的地点搜索必须带搜索范围：不给城市会直接报参数错误，"
+    "而 region(中国,0) 这类写法虽然返回成功、结果却是空的。\n"
+    "  例：python3 tencent_lbs.py {} --city 成都"
+)
+
+
+def _looks_like_coords(text):
+    """`30.66,104.06` 形式的输入不需要城市。"""
+    parts = text.split(",")
+    if len(parts) != 2:
+        return False
+    try:
+        float(parts[0]), float(parts[1])
+    except ValueError:
+        return False
+    return True
+
+
 def _convert(lat, lng, coord):
     return (lat, lng) if coord == "gcj02" else gcj02_to_wgs84(lat, lng)
 
@@ -369,6 +388,8 @@ def cmd_geocode(args, key):
             names += [ln.strip() for ln in fh if ln.strip() and not ln.startswith("#")]
     if not names:
         sys.exit("没有要查的地点：给出地点名，或用 --file 指定一行一个的清单")
+    if not args.city:
+        sys.exit(_NEED_CITY.format("geocode 宽窄巷子"))
 
     results = [geocode_one(n, args.city, key, args.coord) for n in names]
     if args.json:
@@ -425,6 +446,9 @@ def _resolve_point(text, city, key):
 
 
 def cmd_route(args, key):
+    if not args.city and not (_looks_like_coords(args.origin)
+                              and _looks_like_coords(args.dest)):
+        sys.exit(_NEED_CITY.format("route --from 宽窄巷子 --to 武侯祠"))
     origin, o_label = _resolve_point(args.origin, args.city, key)
     dest, d_label = _resolve_point(args.dest, args.city, key)
     payload = api("/ws/direction/v1/{}/".format(args.mode),
@@ -527,6 +551,8 @@ def cmd_matrix(args, key):
             names += [ln.strip() for ln in fh if ln.strip() and not ln.startswith("#")]
     if len(names) < 2:
         sys.exit("距离矩阵至少需要 2 个点")
+    if not args.city:
+        sys.exit(_NEED_CITY.format("matrix 宽窄巷子 武侯祠"))
     if len(names) > 8:
         sys.exit("一次最多 8 个点（收到 {} 个）——按天拆开跑。矩阵按 N×N 个元素"
                  "计入配额，8 个点已是 64 次调用 + 约 16 秒".format(len(names)))
@@ -671,7 +697,7 @@ def build_parser():
     g = sub.add_parser("geocode", help="地点名 → 坐标（带相关性校验）")
     g.add_argument("names", nargs="*", help="一个或多个地点名")
     g.add_argument("--file", help="从文件读，一行一个")
-    g.add_argument("--city", help="限定城市，强烈建议给")
+    g.add_argument("--city", help="限定城市（必需：腾讯搜索要求搜索范围）")
     g.add_argument("--coord", choices=("wgs84", "gcj02"), default="wgs84")
     g.set_defaults(func=cmd_geocode)
 
