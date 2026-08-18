@@ -230,6 +230,80 @@ Array.from(document.querySelectorAll('[class*="ReviewList_reviewItem__"]')).map(
 });
 ```
 
+### 5. 百度地图 · 驾车路线（里程 / 车程 / 途经道路）——**每条自驾腿必跑**
+
+行程里每一段自驾的**里程和车程必须来自这里**，不许估、不许沿用旧版数字（路况会变：新隧道通了、老路封了，数字跟着变）。
+`map.baidu.com` 是 SPA，URL 直接拼 `dir/A/B` 会被重定向回首页，**必须操作页面上的起终点输入框**。
+
+**一次性批量查多段**（实测最稳的姿势；每段约 5–7 秒，**一次 ≤2–3 段**，否则 `javascript_tool` 30 秒超时）：
+
+```javascript
+(async () => {
+  const set=(el,v)=>{const p=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;
+    p.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const q=[['祁连县','西宁市'],['西宁市','兰州市']];        // ← 改这里
+  const out=[];
+  for(const [a,b] of q){
+    const s=[...document.querySelectorAll('input')].find(i=>i.placeholder?.includes('起点'));
+    const e=[...document.querySelectorAll('input')].find(i=>i.placeholder?.includes('终点'));
+    if(s&&e){ set(s,a); set(e,b); }
+    const btn=[...document.querySelectorAll('button')].find(x=>!x.textContent.trim()&&x.offsetParent);
+    btn?.click(); await sleep(2600);
+    // 关键词命中多个 POI 时会弹候选列表，点第一个「选为起点/终点」
+    const pick=[...document.querySelectorAll('a,div,span')]
+      .filter(x=>/^选为(起|终)点$/.test(x.textContent.trim())&&x.children.length===0);
+    if(pick.length){ pick[0].click(); await sleep(2600); }
+    const t=document.body.innerText;
+    out.push({from:a,to:b,
+      hit:(t.match(/(\d+小时\d*分?钟?|\d+分钟)[\s\S]{0,12}?(\d+(?:\.\d+)?)公里/)||[])[0]||'NA',
+      via:(t.match(/途经：([^\n]{0,40})/)||[])[1]||'NA'});
+  }
+  return out;
+})()
+```
+
+**首次进入时**页面只有一个「搜地点、查公交、找路线」框，没有起/终点框：先在该框输入 `A到B` → 点搜索按钮 →
+页面切成路线模式（默认「公交」标签）→ 用 JS 点文本恰为 `驾车` 的元素，之后起/终点框就一直在了。
+
+**要途经道路和分段明细**（判断走哪条路、有没有绕开封闭段时必看）：点开某个方案后 `document.body.innerText`
+里会出现「请直行，进入 XX，行驶 N 公里」的完整导航步骤——**这是识别「主线是否已改走新隧道/新线」的唯一可靠信号**
+（例：`大冬树山隧道 2.6 公里` 就是在告诉你老垭口已被绕开）。
+
+**读数纪律：**
+- 百度默认给 2–3 个方案，**记下推荐方案 + 明显不同的备选**（例：走高速 vs 走国道），写进行程当备选路线。
+- 百度给的是**理论净车程**。带老人小孩、7 座车、山路、频繁停车拍照，**按 ×1.2–1.3 排日程**，并在卡片上分开写清楚
+  「净车程 4h31m（按 5.5h 排）」——两个数都给，用户才知道弹性在哪。
+- 输出一律标 **`百度地图 YYYY-MM-DD 实查`**（受控标签，别改写）。
+- **导航软件对新封路有滞后**：百度可能仍规划一条已封的路。凡是查出来的路线，都要和官方路况通报（省交通运输厅
+  「国省干线路况信息」）对一遍，冲突时**信官方通报**，并在行程里写明。
+
+**坐标（给 POI 打导航点用）**：三个来源三种坐标系，**混用就是几百米的偏差**，按下面的优先级取。
+
+| 来源 | 原生坐标系 | 能不能直接填 `TRIP` |
+|---|---|---|
+| `scripts/tencent_lbs.py geocode` | 腾讯给 GCJ-02，**脚本已转成 WGS-84** | ✅ 首选，直接填 |
+| OSM Nominatim | WGS-84 | ✅ 兜底，直接填 |
+| 百度地图页面 | BD09 | ❌ 绝不直接填 |
+
+1. **首选 `tencent_lbs.py`**（配了 Key 时）——一条命令批量出坐标，且**查不到会明说**：
+
+   ```bash
+   python3 scripts/tencent_lbs.py geocode --file stops.txt --city 成都 --json
+   ```
+
+   输出里 `"found": false, "reason": "no_relevant_match"` 表示**真的没查到**。腾讯的地点搜索对不存在
+   的地名不返回空，而是返回一页无关 POI（实测查「这个地方不存在xyz」返回「清泉镇」，坐标格式完整），
+   脚本按相关性拦掉了。**看到这个就按契约降级，别换个名字硬凑一个坐标填上。**
+
+2. **没配 Key 才退到 OSM Nominatim**：
+   `https://nominatim.openstreetmap.org/search?q=<地名>&format=json&limit=3` → 读 `lat`/`lon`。
+   请求要带 `User-Agent`，且**别高频连打**（公共服务，约每秒 1 次为宜）。
+
+3. **百度页面上的坐标是 BD09，一律不要直接用**——比 GCJ-02 又多偏一层。
+
+三者都查不到的点，降到县城/景区级坐标并注明近似，**别编 4 位小数**。
+
 ---
 
 ## 五、通用注意事项 / 反爬坑
